@@ -1,0 +1,86 @@
+FROM node:20
+
+ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
+ARG AGENT_PLATFORM_CODEX_VERSION
+ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
+ARG AGENT_PLATFORM_TZ
+
+ENV \
+  NPM_CONFIG_PREFIX="/usr/local/share/npm-global" \
+  PATH="/usr/local/share/npm-global/bin:/home/linuxbrew/.linuxbrew/bin:/home/node/.local/bin:${PATH}" \
+  SHELL="/bin/zsh" \
+  EDITOR="nano" \
+  VISUAL="nano" \
+  POWERLEVEL9K_DISABLE_GITSTATUS="true" \
+  TZ="${AGENT_PLATFORM_TZ}" \
+  LANG='en_US.UTF-8' \
+  LANGUAGE='en_US:en' \
+  LC_ALL='en_US.UTF-8'
+
+COPY --chmod=0555 "init-firewall.sh" "/usr/local/bin/init-firewall.sh"
+COPY --chmod=0555 "access.sh" "/usr/local/bin/access.sh"
+COPY --chmod=0444 "sudoers" "/etc/sudoers.d/sudoers"
+COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"
+COPY --chown=node:node --chmod=0774 "config/claude" "/home/node/.claude"
+COPY --chown=node:node --chmod=0774 "config/codex" "/home/node/.codex"
+
+RUN \
+  apt-get update && \
+  apt-get install --yes --no-install-recommends \
+    less \
+    git \
+    procps \
+    sudo \
+    fzf \
+    zsh \
+    man-db \
+    unzip \
+    gnupg2 \
+    iptables \
+    ipset \
+    iproute2 \
+    dnsutils \
+    aggregate \
+    jq \
+    nano \
+    vim \
+    moreutils && \
+  apt-get clean && \
+  rm --recursive --force "/var/lib/apt/lists/*" && \
+  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude/data" "/home/node/.codex/data" "/home/linuxbrew/.linuxbrew" && \
+  touch "/commandhistory/.bash_history" && \
+  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/linuxbrew/.linuxbrew" "/home/node/.claude/data" "/home/node/.codex/data" && \
+  chown --recursive root:root "/etc/claude-code/" "/etc/codex" && \
+  mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
+  mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
+  chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" && \
+  chown root:root "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml"
+
+USER node
+
+RUN \
+  sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
+    -p git \
+    -p fzf \
+    -a 'source /usr/share/doc/fzf/examples/key-bindings.zsh' \
+    -a 'source /usr/share/doc/fzf/examples/completion.zsh' \
+    -a 'export HISTFILE=/commandhistory/.bash_history' \
+    -a 'export HISTSIZE=-1' \
+    -a 'export SAVEHIST=-1' \
+    -a 'setopt APPEND_HISTORY' \
+    -a 'setopt INC_APPEND_HISTORY' \
+    -a 'setopt SHARE_HISTORY' \
+    -a 'setopt HIST_IGNORE_ALL_DUPS' \
+    -a 'setopt HIST_IGNORE_SPACE' \
+    -x && \
+  npm install --global "@anthropic-ai/claude-code@${AGENT_PLATFORM_CLAUDE_CODE_VERSION}" && \
+  npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
+  ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
+  /home/linuxbrew/.linuxbrew/bin/brew install trufflehog
+
+USER root
+RUN chown --recursive root:root "/usr/local/share/npm-global"
+
+USER node
+WORKDIR /workspace
