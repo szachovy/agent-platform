@@ -1,0 +1,71 @@
+---
+name: Build and Push Agent Platform Devcontainer
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+      BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install devcontainer CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Compute image refs
+        id: refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          echo "image_ref_branched=${IMAGE_PATH}:${BRANCH//\//-}" >> "$GITHUB_OUTPUT"
+          echo "image_ref_merged=${IMAGE_PATH}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build devcontainer image
+        env:
+          AGENT_PLATFORM_ALLOW_SSH_AGENT: "false"
+          AGENT_PLATFORM_ALLOW_INTERNET: "false"
+          AGENT_PLATFORM_ALLOW_HOST_NETWORK: "false"
+        run: |
+          devcontainer build \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            --image-name "${{ steps.refs.outputs.image_ref_branched }}"
+
+      - name: Tag and push
+        run: |
+          set -euo pipefail
+          if [[ "${BRANCH}" == "master" || "${BRANCH}" == "main" ]]; then
+            docker tag "${{ steps.refs.outputs.image_ref_branched }}" "${{ steps.refs.outputs.image_ref_merged }}"
+            docker push "${{ steps.refs.outputs.image_ref_merged }}"
+          else
+            docker push "${{ steps.refs.outputs.image_ref_branched }}"
+          fi

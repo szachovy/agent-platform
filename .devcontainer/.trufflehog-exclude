@@ -1,0 +1,9 @@
+/home/node/.cache/
+/home/node/.local/
+/home/node/.npm/
+/home/node/.vscode-server/
+/home/node/.oh-my-zsh/
+/home/node/.zcompdump*
+/home/node/.claude/data/
+/home/node/.codex/auth.json
+/home/node/.codex/data/

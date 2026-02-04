@@ -1,0 +1,43 @@
+{
+  "hooks": {
+    "SessionStart": [],
+    "PreToolUse": [],
+    "PermissionRequest": [],
+    "PostToolUse": [],
+    "Notification": [],
+    "UserPromptSubmit": [],
+    "Stop": [],
+    "SubagentStop": [],
+    "PreCompact": [],
+    "SessionEnd": []
+  },
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "**/.env*",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.crt",
+      "**/.ssh/**",
+      "**/.aws/**",
+      "**/.azure/**",
+      "**/.config/gcloud/**",
+      "**/.gnupg/**",
+      "**/.kube/**",
+      "**/.docker/**"
+    ]
+  },
+  "forceLoginMethod": "claudeai",
+  "enableAllProjectMcpServers": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
+    "CLAUDE_CODE_SHELL": "zsh",
+    "MAX_THINKING_TOKENS": "32000",
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude/data"
+  }
+}
