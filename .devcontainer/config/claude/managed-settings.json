@@ -30,6 +30,10 @@
   },
   "forceLoginMethod": "claudeai",
   "enableAllProjectMcpServers": false,
+  "defaultMode": "dontAsk",
+  "allowManagedPermissionRulesOnly": true,
+  "disableBypassPermissionsMode": "disable",
+  "allowManagedHooksOnly": true,
   "attribution": {
     "commit": "",
     "pr": ""
