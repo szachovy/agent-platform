@@ -53,9 +53,11 @@ check_sudo_node() {
     fi
 }
 
+# For any mount done through standard mechanisms, the current checks will detect them.
+# However, admin can intentionally mount to a non-standard path and not set the corresponding env var to evade detection and increase security risk.
 check_socket() {
     [ -e "/var/run/docker.sock" ] && fail "Docker socket mounted at /var/run/docker.sock" || pass "Docker socket not mounted"
-    [ -e "${SSH_AUTH_SOCK:-/nonexistent}" ] && fail "SSH socket mounted at ${SSH_AUTH_SOCK:-/nonexistent}" || pass "SSH socket not mounted"
+    [ -S "${SSH_AUTH_SOCK:-}" ] && [ "$SSH_AUTH_SOCK" != "$(cat /tmp/.vscode-ssh-auth-sock)" ] && fail "SSH socket at $SSH_AUTH_SOCK"
     [ -e "${GPG_AGENT_INFO%%:*}" ] && fail "GPG socket mounted at ${GPG_AGENT_INFO%%:*}" || pass "GPG socket not mounted"
     [ -S "/run/user/$(id -u)/gnupg/S.gpg-agent" ] && fail "GPG agent socket mounted" || pass "GPG agent socket not mounted"
 }
