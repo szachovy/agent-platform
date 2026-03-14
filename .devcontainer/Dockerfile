@@ -2,6 +2,7 @@ FROM node:20
 
 ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
 ARG AGENT_PLATFORM_CODEX_VERSION
+ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
 ARG AGENT_PLATFORM_TZ
 
@@ -75,6 +76,7 @@ RUN \
     -x && \
   npm install --global "@anthropic-ai/claude-code@${AGENT_PLATFORM_CLAUDE_CODE_VERSION}" && \
   npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
+  npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
   /home/linuxbrew/.linuxbrew/bin/brew install trufflehog
