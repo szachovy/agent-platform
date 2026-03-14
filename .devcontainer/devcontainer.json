@@ -22,9 +22,14 @@
       "extensions": [
         "anthropic.claude-code",
         "openai.chatgpt",
-        "github.copilot"
+        "github.copilot",
+        "github.copilot-chat"
       ],
       "settings": {
+        "github.copilot.enable": {
+          "*": true
+        },
+        "editor.inlineSuggest.enabled": true,
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
           "bash": {
@@ -41,15 +46,15 @@
   "remoteUser": "node",
   "mounts": [
     "source=agent-platform-bashhistory,target=/commandhistory,type=volume",
-    "source=agent-platform-claude-code-config,target=/home/node/.claude/data,type=volume",
-    "source=agent-platform-codex-config,target=/home/node/.codex/data,type=volume"
+    "source=agent-platform-claude-code-config,target=/home/node/.claude,type=volume",
+    "source=agent-platform-codex-config,target=/home/node/.codex,type=volume"
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
   "postStartCommand": [
     "bash",
     "-c",
-    "sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh"
+    "echo \"${SSH_AUTH_SOCK:-}\" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh"
   ],
   "waitFor": "postStartCommand"
 }

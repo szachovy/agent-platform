@@ -105,7 +105,9 @@ if [[ "${AGENT_PLATFORM_ALLOW_INTERNET}" == false ]]; then
         "statsig.com" \
         "marketplace.visualstudio.com" \
         "vscode.blob.core.windows.net" \
-        "update.code.visualstudio.com"; do
+        "update.code.visualstudio.com" \
+        "deb.debian.org" \
+        "security.debian.org"; do
         echo "Resolving $domain..."
         ips=$(dig +noall +answer A "$domain" | awk '$4 == "A" {print $5}')
         if [ -z "$ips" ]; then
@@ -154,11 +156,12 @@ if [[ "${AGENT_PLATFORM_ALLOW_INTERNET}" == false ]]; then
     iptables -A OUTPUT -j REJECT --reject-with icmp-admin-prohibited
 
     echo "Disabling WebFetch and WebSearch permissions in Claude settings..."
+    jq '.permissions |= (. // {}) | .permissions.allow |= (. // []) - (["WebFetch","WebSearch"] - (. // []))' /etc/claude-code/managed-settings.json | sponge /etc/claude-code/managed-settings.json
     jq '.permissions |= (. // {}) | .permissions.deny |= (. // []) + (["WebFetch","WebSearch"] - (. // []))' /etc/claude-code/managed-settings.json | sponge /etc/claude-code/managed-settings.json
 
     echo "Disabling network and web search permissions in Codex settings..."
     sed -i 's/^network_access = true/network_access = false/' /etc/codex/managed_config.toml
-    sed -i 's/^web_search_request = true/web_search_request = false/' /etc/codex/managed_config.toml
+    sed -i 's/^web_search = "live"/web_search = "disabled"/' /etc/codex/managed_config.toml
 else
     echo "Setting default OUTPUT policies to ALLOW..."
     iptables -P OUTPUT ACCEPT
@@ -172,9 +175,10 @@ else
     fi
 
     echo "Enabling WebFetch and WebSearch permissions in Claude settings..."
-    jq '.permissions.deny -= (["WebFetch", "WebSearch"])' /etc/claude-code/managed-settings.json | sponge /etc/claude-code/managed-settings.json
+    jq '.permissions |= (. // {}) | .permissions.allow |= (. // []) + (["WebFetch","WebSearch"] - (. // []))' /etc/claude-code/managed-settings.json | sponge /etc/claude-code/managed-settings.json
+    jq '.permissions |= (. // {}) | .permissions.deny |= (. // []) - (["WebFetch","WebSearch"] - (. // []))' /etc/claude-code/managed-settings.json | sponge /etc/claude-code/managed-settings.json
 
     echo "Enabling network and web search permissions in Codex settings..."
     sed -i 's/^network_access = false/network_access = true/' /etc/codex/managed_config.toml
-    sed -i 's/^web_search_request = false/web_search_request = true/' /etc/codex/managed_config.toml
+    sed -i 's/^web_search = "disabled"/web_search = "live"/' /etc/codex/managed_config.toml
 fi
