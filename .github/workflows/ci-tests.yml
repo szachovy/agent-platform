@@ -1,0 +1,68 @@
+---
+name: CI Tests
+
+on:
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-devcontainer:
+    runs-on: ubuntu-latest
+    env:
+      AGENT_PLATFORM_ALLOW_INTERNET: "false"
+      AGENT_PLATFORM_ALLOW_SSH_AGENT: "false"
+      AGENT_PLATFORM_ALLOW_HOST_NETWORK: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install devcontainer CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start devcontainer
+        run: |
+          devcontainer up \
+            --workspace-folder /tmp \
+            --config "${{ github.workspace }}/.devcontainer/devcontainer.json" \
+            --build-no-cache
+
+      - name: Run container smoke tests
+        run: |
+          CONTAINER_ID=$(docker ps -q --filter "label=devcontainer.local_folder=/tmp")
+          if [ -z "$CONTAINER_ID" ]; then
+            echo "ERROR: No running devcontainer found"
+            exit 1
+          fi
+
+          echo "=== Verify installed tools ==="
+          docker exec "$CONTAINER_ID" claude --version
+          docker exec "$CONTAINER_ID" codex --version
+
+          echo "=== Verify non-root user ==="
+          docker exec "$CONTAINER_ID" bash -c '[ "$(id -u)" -ne 0 ] && echo "PASS: Non-root user" || (echo "FAIL: Running as root" && exit 1)'
+
+          echo "=== Verify init scripts exist ==="
+          docker exec "$CONTAINER_ID" test -x /usr/local/bin/init-firewall.sh
+          docker exec "$CONTAINER_ID" test -x /usr/local/bin/access.sh
+
+          echo "=== Verify managed settings exist ==="
+          docker exec "$CONTAINER_ID" test -f /etc/claude-code/managed-settings.json
+          docker exec "$CONTAINER_ID" test -f /etc/codex/managed_config.toml
+
+          echo "=== Verify managed settings are root-owned ==="
+          docker exec "$CONTAINER_ID" bash -c '[ "$(stat -c %U /etc/claude-code/managed-settings.json)" = "root" ] && echo "PASS" || (echo "FAIL" && exit 1)'
+          docker exec "$CONTAINER_ID" bash -c '[ "$(stat -c %U /etc/codex/managed_config.toml)" = "root" ] && echo "PASS" || (echo "FAIL" && exit 1)'
+
+          echo "=== All smoke tests passed ==="
