@@ -44,12 +44,21 @@ check_sudo_node() {
     sudo_cmds=$(sudo -l -U node 2>/dev/null | grep -E '^\s+\(root\)' | awk '{print $NF}' | sort -u)
     cmd_count=$(echo "$sudo_cmds" | grep -v '^$' | wc -l)
 
-    if [ "$cmd_count" -eq 1 ] && echo "$sudo_cmds" | grep -q '^/usr/local/bin/init-firewall.sh$'; then
-        pass "User node can only sudo /usr/local/bin/init-firewall.sh"
-    elif [ "$cmd_count" -eq 0 ]; then
+    local allowed_cmds="/usr/local/bin/init-firewall.sh /usr/local/bin/init-otel.sh"
+    local unexpected=""
+    while read -r cmd; do
+        [[ -z "$cmd" ]] && continue
+        if ! echo "$allowed_cmds" | grep -qw "$cmd"; then
+            unexpected="$unexpected $cmd"
+        fi
+    done <<< "$sudo_cmds"
+
+    if [ "$cmd_count" -eq 0 ]; then
         fail "User node has no sudo privileges"
+    elif [ -z "$unexpected" ]; then
+        pass "User node sudo restricted to allowed init scripts"
     else
-        fail "User node can sudo other commands: $sudo_cmds"
+        fail "User node can sudo unexpected commands:$unexpected"
     fi
 }
 

@@ -18,6 +18,7 @@ ENV \
   LC_ALL='en_US.UTF-8'
 
 COPY --chmod=0555 "init-firewall.sh" "/usr/local/bin/init-firewall.sh"
+COPY --chmod=0555 "init-otel.sh" "/usr/local/bin/init-otel.sh"
 COPY --chmod=0555 "access.sh" "/usr/local/bin/access.sh"
 COPY --chmod=0444 "sudoers" "/etc/sudoers.d/sudoers"
 COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"

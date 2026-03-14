@@ -13,6 +13,9 @@
     "AGENT_PLATFORM_ALLOW_INTERNET": "${localEnv:AGENT_PLATFORM_ALLOW_INTERNET:true}",
     "AGENT_PLATFORM_ALLOW_SSH_AGENT": "${localEnv:AGENT_PLATFORM_ALLOW_SSH_AGENT:true}",
     "AGENT_PLATFORM_ALLOW_HOST_NETWORK": "${localEnv:AGENT_PLATFORM_ALLOW_HOST_NETWORK:true}",
+    "AGENT_PLATFORM_OTEL_ENDPOINT": "${localEnv:AGENT_PLATFORM_OTEL_ENDPOINT:}",
+    "AGENT_PLATFORM_OTEL_PROTOCOL": "${localEnv:AGENT_PLATFORM_OTEL_PROTOCOL:grpc}",
+    "AGENT_PLATFORM_OTEL_HEADERS": "${localEnv:AGENT_PLATFORM_OTEL_HEADERS:}",
     "NODE_OPTIONS": "--max-old-space-size=4096",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
@@ -54,7 +57,7 @@
   "postStartCommand": [
     "bash",
     "-c",
-    "echo \"${SSH_AUTH_SOCK:-}\" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh"
+    "echo \"${SSH_AUTH_SOCK:-}\" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && sudo /usr/local/bin/init-otel.sh && /usr/local/bin/access.sh"
   ],
   "waitFor": "postStartCommand"
 }

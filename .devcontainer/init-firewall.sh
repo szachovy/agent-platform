@@ -125,6 +125,24 @@ if [[ "${AGENT_PLATFORM_ALLOW_INTERNET}" == false ]]; then
         done < <(echo "$ips")
     done
 
+    if [[ -n "${AGENT_PLATFORM_OTEL_ENDPOINT:-}" ]]; then
+        otel_host=$(echo "$AGENT_PLATFORM_OTEL_ENDPOINT" | sed -E 's|^https?://||' | sed -E 's|:[0-9]+.*||' | sed -E 's|/.*||')
+        if [[ -n "$otel_host" ]]; then
+            echo "Resolving OpenTelemetry endpoint $otel_host..."
+            otel_ips=$(dig +noall +answer A "$otel_host" | awk '$4 == "A" {print $5}')
+            if [ -n "$otel_ips" ]; then
+                while read -r ip; do
+                    if [[ "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+                        echo "Adding $ip for OpenTelemetry endpoint $otel_host"
+                        ipset add -! allowed-domains "$ip/32"
+                    fi
+                done < <(echo "$otel_ips")
+            else
+                echo "WARNING: Failed to resolve OpenTelemetry endpoint $otel_host, skipping"
+            fi
+        fi
+    fi
+
     echo "Setting default OUTPUT policies to DROP..."
     iptables -P OUTPUT DROP
 
