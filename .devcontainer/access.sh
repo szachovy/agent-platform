@@ -6,6 +6,7 @@ fail() { echo "FAIL: $*"; failed=1; }
 
 check_fs() {
     /home/linuxbrew/.linuxbrew/bin/trufflehog filesystem /home/node \
+        --no-update \
         --exclude-paths /home/node/.trufflehog-exclude \
         --fail >/dev/null 2>&1
     case $? in
@@ -16,7 +17,7 @@ check_fs() {
 }
 
 check_env() {
-    printenv | /home/linuxbrew/.linuxbrew/bin/trufflehog stdin --fail >/dev/null 2>&1
+    printenv | /home/linuxbrew/.linuxbrew/bin/trufflehog stdin --no-update --fail >/dev/null 2>&1
     case $? in
         0) pass "No secrets in environment" ;;
         183) fail "Secrets found in environment" ;;
