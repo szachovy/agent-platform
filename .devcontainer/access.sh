@@ -4,6 +4,13 @@ failed=0
 pass() { echo "PASS: $*"; }
 fail() { echo "FAIL: $*"; failed=1; }
 
+
+/home/linuxbrew/.linuxbrew/bin/trufflehog filesystem /home/node \
+  --exclude-paths /home/node/.trufflehog-exclude \
+  --fail 2>&1 || true
+
+printenv | /home/linuxbrew/.linuxbrew/bin/trufflehog stdin --fail 2>&1 || true
+
 check_fs() {
     /home/linuxbrew/.linuxbrew/bin/trufflehog filesystem /home/node \
         --exclude-paths /home/node/.trufflehog-exclude \
