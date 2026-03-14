@@ -46,6 +46,17 @@ jobs:
             exit 1
           fi
 
+          echo "=== Debug: trufflehog filesystem scan ==="
+          docker exec "$CONTAINER_ID" \
+            /home/linuxbrew/.linuxbrew/bin/trufflehog filesystem /home/node \
+              --exclude-paths /home/node/.trufflehog-exclude \
+              --fail 2>&1 || true
+
+          echo "=== Debug: trufflehog environment scan ==="
+          docker exec "$CONTAINER_ID" \
+            bash -c 'printenv | /home/linuxbrew/.linuxbrew/bin/trufflehog stdin --fail 2>&1' || true
+
+          echo "=== Running postStartCommand ==="
           docker exec \
             -e AGENT_PLATFORM_ALLOW_INTERNET="$AGENT_PLATFORM_ALLOW_INTERNET" \
             -e AGENT_PLATFORM_ALLOW_SSH_AGENT="$AGENT_PLATFORM_ALLOW_SSH_AGENT" \
