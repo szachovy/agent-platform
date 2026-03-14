@@ -47,9 +47,9 @@ RUN \
     moreutils && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
-  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude/data" "/home/node/.codex/data" "/home/linuxbrew/.linuxbrew" && \
+  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude" "/home/node/.codex" "/home/linuxbrew/.linuxbrew" && \
   touch "/commandhistory/.bash_history" && \
-  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/linuxbrew/.linuxbrew" "/home/node/.claude/data" "/home/node/.codex/data" && \
+  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/linuxbrew/.linuxbrew" "/home/node/.claude" "/home/node/.codex" && \
   chown --recursive root:root "/etc/claude-code/" "/etc/codex" && \
   mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
