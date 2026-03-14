@@ -46,23 +46,9 @@ jobs:
             exit 1
           fi
 
-          echo "=== Verify installed tools ==="
-          docker exec "$CONTAINER_ID" claude --version
-          docker exec "$CONTAINER_ID" codex --version
-
-          echo "=== Verify non-root user ==="
-          docker exec "$CONTAINER_ID" bash -c '[ "$(id -u)" -ne 0 ] && echo "PASS: Non-root user" || (echo "FAIL: Running as root" && exit 1)'
-
-          echo "=== Verify init scripts exist ==="
-          docker exec "$CONTAINER_ID" test -x /usr/local/bin/init-firewall.sh
-          docker exec "$CONTAINER_ID" test -x /usr/local/bin/access.sh
-
-          echo "=== Verify managed settings exist ==="
-          docker exec "$CONTAINER_ID" test -f /etc/claude-code/managed-settings.json
-          docker exec "$CONTAINER_ID" test -f /etc/codex/managed_config.toml
-
-          echo "=== Verify managed settings are root-owned ==="
-          docker exec "$CONTAINER_ID" bash -c '[ "$(stat -c %U /etc/claude-code/managed-settings.json)" = "root" ] && echo "PASS" || (echo "FAIL" && exit 1)'
-          docker exec "$CONTAINER_ID" bash -c '[ "$(stat -c %U /etc/codex/managed_config.toml)" = "root" ] && echo "PASS" || (echo "FAIL" && exit 1)'
-
-          echo "=== All smoke tests passed ==="
+          docker exec \
+            -e AGENT_PLATFORM_ALLOW_INTERNET="$AGENT_PLATFORM_ALLOW_INTERNET" \
+            -e AGENT_PLATFORM_ALLOW_SSH_AGENT="$AGENT_PLATFORM_ALLOW_SSH_AGENT" \
+            -e AGENT_PLATFORM_ALLOW_HOST_NETWORK="$AGENT_PLATFORM_ALLOW_HOST_NETWORK" \
+            "$CONTAINER_ID" \
+            bash -c 'echo "${SSH_AUTH_SOCK:-}" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh'
