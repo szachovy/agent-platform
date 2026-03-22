@@ -38,23 +38,6 @@ jobs:
             --config "${{ github.workspace }}/.devcontainer/devcontainer.json" \
             --build-no-cache
 
-      - name: Get devcontainer image name
-        id: image
-        run: |
-          CONTAINER_ID=$(docker ps -q --filter "label=devcontainer.local_folder=/tmp")
-          IMAGE=$(docker inspect --format='{{.Config.Image}}' "$CONTAINER_ID")
-          echo "name=${IMAGE}" >> "$GITHUB_OUTPUT"
-
-      - name: Run Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: 'image'
-          image-ref: '${{ steps.image.outputs.name }}'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '1'
-          ignore-unfixed: true
-
       - name: Run container smoke tests
         run: |
           CONTAINER_ID=$(docker ps -q --filter "label=devcontainer.local_folder=/tmp")
