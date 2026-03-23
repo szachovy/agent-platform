@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ARM64 (Apple Silicon) devcontainer support: replaced Homebrew-based TruffleHog with direct binary download using Docker `TARGETARCH`.
+- Multi-arch (amd64/arm64) builds and CI tests via QEMU emulation and matrix strategy.
+- Trivy container image vulnerability scanning in the deployment workflow (`deployment.yml`).
+- GitHub CI tests workflow (`ci-tests.yml`) for automated devcontainer smoke tests on pull requests.
+- Backlog.md CLI installed globally for project task management, with documentation in CLAUDE.md and AGENTS.md.
+
+### Changed
+
+- Hardened managed settings for Claude Code and Codex: stricter permission defaults, credential path deny lists, forced login methods.
+- Firewall script updated to dynamically toggle WebFetch/WebSearch and Codex network settings based on environment flags.
+- TruffleHog exclusion list and access test script updated for broader coverage.
+- Devcontainer configuration updated with Copilot extensions and volume mounts for persistent config.
+
+### Fixed
+
+- Access test SSH socket validation to skip VSCode SSH agent.
+
+### PoC MVP
+
 - Claude Code and Codex configuration, including:
   - Managed settings focused on non-exploitability.
   - Security rules.

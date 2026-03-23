@@ -11,7 +11,12 @@ permissions:
 
 jobs:
   test-devcontainer:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+          - runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     env:
       AGENT_PLATFORM_ALLOW_INTERNET: "false"
       AGENT_PLATFORM_ALLOW_SSH_AGENT: "false"
@@ -20,35 +25,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install devcontainer CLI
-        run: npm install -g @devcontainers/cli
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and start devcontainer
+      - name: Build devcontainer image
         run: |
-          devcontainer up \
-            --workspace-folder /tmp \
-            --config "${{ github.workspace }}/.devcontainer/devcontainer.json" \
-            --build-no-cache
+          docker buildx build \
+            --load \
+            -t agent-platform-test \
+            .devcontainer
 
-      - name: Run container smoke tests
+      - name: Start container and run smoke tests
         run: |
-          CONTAINER_ID=$(docker ps -q --filter "label=devcontainer.local_folder=/tmp")
-          if [ -z "$CONTAINER_ID" ]; then
-            echo "ERROR: No running devcontainer found"
-            exit 1
-          fi
-
-          docker exec \
+          docker run \
+            --rm \
+            --cap-add=NET_ADMIN \
             -e AGENT_PLATFORM_ALLOW_INTERNET="$AGENT_PLATFORM_ALLOW_INTERNET" \
             -e AGENT_PLATFORM_ALLOW_SSH_AGENT="$AGENT_PLATFORM_ALLOW_SSH_AGENT" \
             -e AGENT_PLATFORM_ALLOW_HOST_NETWORK="$AGENT_PLATFORM_ALLOW_HOST_NETWORK" \
-            "$CONTAINER_ID" \
+            agent-platform-test \
             bash -c 'echo "${SSH_AUTH_SOCK:-}" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh'
