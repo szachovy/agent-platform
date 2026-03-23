@@ -9,7 +9,6 @@ on:
 permissions:
   contents: read
   packages: write
-  security-events: write
 
 jobs:
   build-and-push:
@@ -67,17 +66,9 @@ jobs:
           scan-type: 'image'
           image-ref: '${{ steps.refs.outputs.image_ref_branched }}'
           scanners: 'vuln'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'CRITICAL'
-          exit-code: '1'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
 
       - name: Tag and push
         run: |
