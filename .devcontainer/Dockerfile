@@ -1,5 +1,6 @@
 FROM node:20
 
+ARG TARGETARCH
 ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
 ARG AGENT_PLATFORM_CODEX_VERSION
 ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
@@ -8,7 +9,7 @@ ARG AGENT_PLATFORM_TZ
 
 ENV \
   NPM_CONFIG_PREFIX="/usr/local/share/npm-global" \
-  PATH="/usr/local/share/npm-global/bin:/home/linuxbrew/.linuxbrew/bin:/home/node/.local/bin:${PATH}" \
+  PATH="/usr/local/share/npm-global/bin:/home/node/.local/bin:${PATH}" \
   SHELL="/bin/zsh" \
   EDITOR="nano" \
   VISUAL="nano" \
@@ -48,9 +49,9 @@ RUN \
     moreutils && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
-  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude" "/home/node/.codex" "/home/linuxbrew/.linuxbrew" && \
+  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude" "/home/node/.codex" && \
   touch "/commandhistory/.bash_history" && \
-  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/linuxbrew/.linuxbrew" "/home/node/.claude" "/home/node/.codex" && \
+  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" && \
   chown --recursive root:root "/etc/claude-code/" "/etc/codex" && \
   mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
@@ -78,8 +79,10 @@ RUN \
   npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
-  /home/linuxbrew/.linuxbrew/bin/brew install trufflehog
+  mkdir --parents "/home/node/.local/bin" && \
+  TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
+  curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \
+  mv /tmp/trufflehog /home/node/.local/bin/trufflehog
 
 USER root
 RUN chown --recursive root:root "/usr/local/share/npm-global"

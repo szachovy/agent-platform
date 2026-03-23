@@ -11,8 +11,17 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            arch-suffix: linux-amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch-suffix: linux-arm64
+    runs-on: ${{ matrix.runner }}
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
@@ -20,14 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install devcontainer CLI
-        run: npm install -g @devcontainers/cli
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -39,26 +40,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Compute image refs
         id: refs
         shell: bash
         run: |
           set -euo pipefail
           IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
-          echo "image_ref_branched=${IMAGE_PATH}:${BRANCH//\//-}" >> "$GITHUB_OUTPUT"
-          echo "image_ref_merged=${IMAGE_PATH}:latest" >> "$GITHUB_OUTPUT"
+          echo "image_ref_branched=${IMAGE_PATH}:${BRANCH//\//-}-${{ matrix.arch-suffix }}" >> "$GITHUB_OUTPUT"
+          echo "image_path=${IMAGE_PATH}" >> "$GITHUB_OUTPUT"
 
       - name: Build devcontainer image
-        env:
-          AGENT_PLATFORM_ALLOW_SSH_AGENT: "false"
-          AGENT_PLATFORM_ALLOW_INTERNET: "false"
-          AGENT_PLATFORM_ALLOW_HOST_NETWORK: "false"
         run: |
-          devcontainer build \
-            --workspace-folder . \
-            --config .devcontainer/devcontainer.json \
-            --image-name "${{ steps.refs.outputs.image_ref_branched }}"
+          docker buildx build \
+            --load \
+            -t "${{ steps.refs.outputs.image_ref_branched }}" \
+            .devcontainer
 
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.35.0
@@ -70,12 +66,38 @@ jobs:
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
 
-      - name: Tag and push
+      - name: Push arch-specific image
+        run: docker push "${{ steps.refs.outputs.image_ref_branched }}"
+
+  manifest:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+      BRANCH: ${{ github.ref_name }}
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
         run: |
           set -euo pipefail
+          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          BRANCH_TAG="${BRANCH//\//-}"
+
+          docker manifest create "${IMAGE_PATH}:${BRANCH_TAG}" \
+            "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64" \
+            "${IMAGE_PATH}:${BRANCH_TAG}-linux-arm64"
+          docker manifest push "${IMAGE_PATH}:${BRANCH_TAG}"
+
           if [[ "${BRANCH}" == "master" || "${BRANCH}" == "main" ]]; then
-            docker tag "${{ steps.refs.outputs.image_ref_branched }}" "${{ steps.refs.outputs.image_ref_merged }}"
-            docker push "${{ steps.refs.outputs.image_ref_merged }}"
-          else
-            docker push "${{ steps.refs.outputs.image_ref_branched }}"
+            docker manifest create "${IMAGE_PATH}:latest" \
+              "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64" \
+              "${IMAGE_PATH}:${BRANCH_TAG}-linux-arm64"
+            docker manifest push "${IMAGE_PATH}:latest"
           fi
