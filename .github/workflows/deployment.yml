@@ -60,6 +60,16 @@ jobs:
             --config .devcontainer/devcontainer.json \
             --image-name "${{ steps.refs.outputs.image_ref_branched }}"
 
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: 'image'
+          image-ref: '${{ steps.refs.outputs.image_ref_branched }}'
+          scanners: 'vuln'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
       - name: Tag and push
         run: |
           set -euo pipefail
