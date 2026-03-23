@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Token usage monitoring skill for Claude Code and Codex agents — checks Anthropic/OpenAI usage via API or directs to web dashboards.
 - ARM64 (Apple Silicon) devcontainer support: replaced Homebrew-based TruffleHog with direct binary download using Docker `TARGETARCH`.
 - Multi-arch (amd64/arm64) builds and CI tests via QEMU emulation and matrix strategy.
 - Trivy container image vulnerability scanning in the deployment workflow (`deployment.yml`).
