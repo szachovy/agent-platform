@@ -26,6 +26,7 @@ skills/
 
 - **build-context**: Gathers comprehensive context about a specific area of the codebase for future development. Use when preparing for feature implementation, major refactoring, or understanding complex subsystems.
 - **explaining-code**: Explains code with visual diagrams and analogies. Use when explaining how code works, teaching about a codebase, or when the user asks "how does this work?"
+- **token-usage**: Shows current API token usage, remaining quota, and percentages. Use when the user wants to check how many tokens they've consumed, their remaining budget, or usage breakdown by model.
 
 ### Private Skills (`skills/private/`)
 
