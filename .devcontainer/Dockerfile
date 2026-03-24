@@ -33,6 +33,7 @@ RUN \
   apt-get install --yes --no-install-recommends \
     less \
     git \
+    gh \
     procps \
     sudo \
     fzf \
@@ -68,6 +69,7 @@ RUN \
   sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
     -p git \
     -p fzf \
+    -a 'export OPENCODE_CONFIG_CONTENT="$(jq -c . /etc/opencode/managed_config.json 2>/dev/null || printf "{}")"' \
     -a 'source /usr/share/doc/fzf/examples/key-bindings.zsh' \
     -a 'source /usr/share/doc/fzf/examples/completion.zsh' \
     -a 'export HISTFILE=/commandhistory/.bash_history' \
