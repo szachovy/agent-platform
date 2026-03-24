@@ -4,6 +4,12 @@
   "instructions": [
     "/home/node/.opencode/AGENTS.md"
   ],
+  "mcp": {
+    "context7": {
+      "type": "local",
+      "command": ["context7-mcp"]
+    }
+  },
   "permission": {
     "*": "allow",
     "external_directory": "deny",
