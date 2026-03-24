@@ -1,6 +1,6 @@
 # Agent Platform
 
-Agent Platform is a devcontainer-based runtime for safely configuring and running AI agents in an isolated environment.
+Agent Platform is a devcontainer-based runtime for safely configuring and running AI agents (Claude Code, OpenAI Codex, and Opencode) in an isolated environment.
 
 ## Prerequisites
 
@@ -29,6 +29,7 @@ Configuration is managed through environment variables.
 | --- | --- | --- | --- | --- |
 | `AGENT_PLATFORM_CLAUDE_CODE_VERSION` | `latest` | Devcontainer build arg that selects the Claude Code version. | No | String (version tag, e.g. `latest` or `1.2.3`) |
 | `AGENT_PLATFORM_CODEX_VERSION` | `latest` | Devcontainer build arg that selects the Codex version. | No | String (version tag, e.g. `latest` or `1.2.3`) |
+| `AGENT_PLATFORM_OPENCODE_VERSION` | `latest` | Devcontainer build arg that selects the Opencode version. | No | String (version tag, e.g. `latest` or `1.3.0`) |
 | `AGENT_PLATFORM_BACKLOG_MD_VERSION` | `latest` | Devcontainer build arg that selects the Backlog.md CLI version. | No | String (version tag, e.g. `latest` or `1.40.0`) |
 | `AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION` | `1.2.0` | Devcontainer build arg that selects the zsh-in-docker version. | No | String (version tag, e.g. `1.2.0`) |
 | `AGENT_PLATFORM_ALLOW_INTERNET` | `true` | Allow internet access inside the devcontainer. | No | Boolean (`true`/`false`) |
@@ -49,6 +50,7 @@ Currently, extension versions can’t be specified via environment variables in 
 - [Running codex cli in VS Code devcontainer](https://github.com/openai/codex/issues/2454)
 - [Anthropic Claude-Code configuration reference](https://code.claude.com/docs/en/settings)
 - [OpenAI Codex configuration reference](https://developers.openai.com/codex/config-reference)
+- [Opencode configuration reference](https://opencode.ai/docs/config/)
 - [Anthropic Claude-Code developer's guide](https://platform.claude.com/docs/en/home)
 
 ## Contributing

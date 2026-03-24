@@ -81,6 +81,7 @@ check_paths() {
         "/usr/local/bin/access.sh"
         "/etc/claude-code/managed-settings.json"
         "/etc/codex/managed_config.toml"
+        "/etc/opencode/managed_config.json"
         "/etc/sudoers.d/sudoers"
         "/usr/local/share/npm-global"
     )

@@ -15,11 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trivy container image vulnerability scanning in the deployment workflow (`deployment.yml`).
 - GitHub CI tests workflow (`ci-tests.yml`) for automated devcontainer smoke tests on pull requests.
 - Backlog.md CLI installed globally for project task management, with documentation in CLAUDE.md and AGENTS.md.
+- Opencode integrated as a third AI agent with managed config, persistent volume mount, and dedicated guidelines/tooling docs.
 
 ### Changed
 
 - Hardened managed settings for Claude Code and Codex: stricter permission defaults, credential path deny lists, forced login methods.
 - Firewall script updated to dynamically toggle WebFetch/WebSearch and Codex network settings based on environment flags.
+- Firewall and access checks extended for Opencode managed config permissions and internet-mode web permission toggles.
 - TruffleHog exclusion list and access test script updated for broader coverage.
 - Devcontainer configuration updated with Copilot extensions and volume mounts for persistent config.
 

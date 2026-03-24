@@ -5,6 +5,7 @@
     "args": {
       "AGENT_PLATFORM_CLAUDE_CODE_VERSION": "${localEnv:AGENT_PLATFORM_CLAUDE_CODE_VERSION:latest}",
       "AGENT_PLATFORM_CODEX_VERSION": "${localEnv:AGENT_PLATFORM_CODEX_VERSION:latest}",
+      "AGENT_PLATFORM_OPENCODE_VERSION": "${localEnv:AGENT_PLATFORM_OPENCODE_VERSION:latest}",
       "AGENT_PLATFORM_BACKLOG_MD_VERSION": "${localEnv:AGENT_PLATFORM_BACKLOG_MD_VERSION:latest}",
       "AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION": "${localEnv:AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION:1.2.0}",
       "AGENT_PLATFORM_TZ": "${localEnv:AGENT_PLATFORM_TZ:Europe/Warsaw}"
@@ -15,7 +16,9 @@
     "AGENT_PLATFORM_ALLOW_SSH_AGENT": "${localEnv:AGENT_PLATFORM_ALLOW_SSH_AGENT:true}",
     "AGENT_PLATFORM_ALLOW_HOST_NETWORK": "${localEnv:AGENT_PLATFORM_ALLOW_HOST_NETWORK:true}",
     "NODE_OPTIONS": "--max-old-space-size=4096",
-    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true",
+    "OPENCODE_CONFIG": "/etc/opencode/managed_config.json",
+    "OPENCODE_CONFIG_DIR": "/home/node/.opencode"
   },
   "runArgs": ["--cap-add=NET_ADMIN"],
   "customizations": {
@@ -48,7 +51,8 @@
   "mounts": [
     "source=agent-platform-bashhistory,target=/commandhistory,type=volume",
     "source=agent-platform-claude-code-config,target=/home/node/.claude,type=volume",
-    "source=agent-platform-codex-config,target=/home/node/.codex,type=volume"
+    "source=agent-platform-codex-config,target=/home/node/.codex,type=volume",
+    "source=agent-platform-opencode-config,target=/home/node/.opencode,type=volume"
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",

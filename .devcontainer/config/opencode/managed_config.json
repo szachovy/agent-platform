@@ -1,0 +1,83 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "instructions": [
+    "/home/node/.opencode/AGENTS.md"
+  ],
+  "permission": {
+    "*": "allow",
+    "external_directory": "deny",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "read": {
+      "*": "allow",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.crt": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.azure/**": "deny",
+      "**/.config/gcloud/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.docker/**": "deny"
+    },
+    "edit": {
+      "*": "allow",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.crt": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.azure/**": "deny",
+      "**/.config/gcloud/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.docker/**": "deny"
+    },
+    "glob": {
+      "*": "allow",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.crt": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.azure/**": "deny",
+      "**/.config/gcloud/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.docker/**": "deny"
+    },
+    "grep": {
+      "*": "allow",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.crt": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.azure/**": "deny",
+      "**/.config/gcloud/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.docker/**": "deny"
+    },
+    "list": {
+      "*": "allow",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.crt": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.azure/**": "deny",
+      "**/.config/gcloud/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.docker/**": "deny"
+    }
+  }
+}

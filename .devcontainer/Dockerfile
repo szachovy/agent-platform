@@ -3,6 +3,7 @@ FROM node:20
 ARG TARGETARCH
 ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
 ARG AGENT_PLATFORM_CODEX_VERSION
+ARG AGENT_PLATFORM_OPENCODE_VERSION
 ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
 ARG AGENT_PLATFORM_TZ
@@ -25,12 +26,14 @@ COPY --chmod=0444 "sudoers" "/etc/sudoers.d/sudoers"
 COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"
 COPY --chown=node:node --chmod=0774 "config/claude" "/home/node/.claude"
 COPY --chown=node:node --chmod=0774 "config/codex" "/home/node/.codex"
+COPY --chown=node:node --chmod=0774 "config/opencode" "/home/node/.opencode"
 
 RUN \
   apt-get update && \
   apt-get install --yes --no-install-recommends \
     less \
     git \
+    gh \
     procps \
     sudo \
     fzf \
@@ -49,14 +52,16 @@ RUN \
     moreutils && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
-  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/home/node/.claude" "/home/node/.codex" && \
+  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/etc/opencode" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
   touch "/commandhistory/.bash_history" && \
-  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" && \
-  chown --recursive root:root "/etc/claude-code/" "/etc/codex" && \
+  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
+  chown --recursive root:root "/etc/claude-code/" "/etc/codex" "/etc/opencode" && \
   mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
-  chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" && \
-  chown root:root "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml"
+  mv "/home/node/.opencode/managed_config.json" "/etc/opencode/" && \
+  chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
+  chown root:root "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
+  ln --symbolic "/etc/opencode/managed_config.json" "/home/node/.opencode/managed_config.json"
 
 USER node
 
@@ -64,6 +69,7 @@ RUN \
   sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
     -p git \
     -p fzf \
+    -a 'export OPENCODE_CONFIG_CONTENT="$(jq -c . /etc/opencode/managed_config.json 2>/dev/null || printf "{}")"' \
     -a 'source /usr/share/doc/fzf/examples/key-bindings.zsh' \
     -a 'source /usr/share/doc/fzf/examples/completion.zsh' \
     -a 'export HISTFILE=/commandhistory/.bash_history' \
@@ -77,6 +83,7 @@ RUN \
     -x && \
   npm install --global "@anthropic-ai/claude-code@${AGENT_PLATFORM_CLAUDE_CODE_VERSION}" && \
   npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
+  npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
   mkdir --parents "/home/node/.local/bin" && \

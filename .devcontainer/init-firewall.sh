@@ -162,6 +162,9 @@ if [[ "${AGENT_PLATFORM_ALLOW_INTERNET}" == false ]]; then
     echo "Disabling network and web search permissions in Codex settings..."
     sed -i 's/^network_access = true/network_access = false/' /etc/codex/managed_config.toml
     sed -i 's/^web_search = "live"/web_search = "disabled"/' /etc/codex/managed_config.toml
+
+    echo "Disabling web permissions in Opencode settings..."
+    jq '.permission |= (. // {}) | .permission.webfetch = "deny" | .permission.websearch = "deny"' /etc/opencode/managed_config.json | sponge /etc/opencode/managed_config.json
 else
     echo "Setting default OUTPUT policies to ALLOW..."
     iptables -P OUTPUT ACCEPT
@@ -181,4 +184,7 @@ else
     echo "Enabling network and web search permissions in Codex settings..."
     sed -i 's/^network_access = false/network_access = true/' /etc/codex/managed_config.toml
     sed -i 's/^web_search = "disabled"/web_search = "live"/' /etc/codex/managed_config.toml
+
+    echo "Enabling web permissions in Opencode settings..."
+    jq '.permission |= (. // {}) | .permission.webfetch = "allow" | .permission.websearch = "allow"' /etc/opencode/managed_config.json | sponge /etc/opencode/managed_config.json
 fi
