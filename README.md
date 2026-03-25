@@ -31,6 +31,7 @@ Configuration is managed through environment variables.
 | `AGENT_PLATFORM_CODEX_VERSION` | `latest` | Devcontainer build arg that selects the Codex version. | No | String (version tag, e.g. `latest` or `1.2.3`) |
 | `AGENT_PLATFORM_OPENCODE_VERSION` | `latest` | Devcontainer build arg that selects the Opencode version. | No | String (version tag, e.g. `latest` or `1.3.0`) |
 | `AGENT_PLATFORM_BACKLOG_MD_VERSION` | `latest` | Devcontainer build arg that selects the Backlog.md CLI version. | No | String (version tag, e.g. `latest` or `1.40.0`) |
+| `AGENT_PLATFORM_CONTEXT7_VERSION` | `latest` | Devcontainer build arg that selects the Context7 MCP server version. | No | String (version tag, e.g. `latest` or `1.0.0`) |
 | `AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION` | `1.2.0` | Devcontainer build arg that selects the zsh-in-docker version. | No | String (version tag, e.g. `1.2.0`) |
 | `AGENT_PLATFORM_ALLOW_INTERNET` | `true` | Allow internet access inside the devcontainer. | No | Boolean (`true`/`false`) |
 | `AGENT_PLATFORM_ALLOW_SSH_AGENT` | `true` | Allow SSH agent forwarding into the devcontainer. | No | Boolean (`true`/`false`) |

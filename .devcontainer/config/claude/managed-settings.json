@@ -54,6 +54,12 @@
     ]
   },
   "forceLoginMethod": "claudeai",
+  "mcpServers": {
+    "context7": {
+      "command": "context7-mcp",
+      "args": []
+    }
+  },
   "enableAllProjectMcpServers": false,
   "defaultMode": "dontAsk",
   "allowManagedPermissionRulesOnly": true,

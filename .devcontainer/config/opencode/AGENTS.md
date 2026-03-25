@@ -680,3 +680,7 @@ Tests:
 Full help available: `backlog --help`
 
 <!-- BACKLOG.MD GUIDELINES END -->
+
+<!-- CONTEXT7 GUIDELINES START -->
+Always use Context7 when I use/need documentation of the tool without me having to explicitly ask.
+<!-- CONTEXT7 GUIDELINES END -->

@@ -5,6 +5,7 @@ ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
 ARG AGENT_PLATFORM_CODEX_VERSION
 ARG AGENT_PLATFORM_OPENCODE_VERSION
 ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
+ARG AGENT_PLATFORM_CONTEXT7_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
 ARG AGENT_PLATFORM_TZ
 
@@ -85,6 +86,7 @@ RUN \
   npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
+  npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
   ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
   mkdir --parents "/home/node/.local/bin" && \
   TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \

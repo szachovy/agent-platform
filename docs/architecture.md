@@ -6,6 +6,7 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 
 - Devcontainer build and runtime definitions for repeatable setup.
 - Agent configuration for Claude Code, OpenAI Codex, and Opencode with managed settings.
+- MCP server integration, starting with Context7 (by Upstash) for live, version-pinned library documentation.
 - Security constraints, firewall defaults, and secret scanning exclusions.
 - CI workflow to build and publish the container image.
 

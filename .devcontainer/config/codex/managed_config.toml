@@ -17,3 +17,7 @@ ignore_default_excludes = false
 set = { CODEX_HOME = "/home/node/.codex" }
 
 [mcp_servers]
+
+[mcp_servers.context7]
+command = "context7-mcp"
+args = []
