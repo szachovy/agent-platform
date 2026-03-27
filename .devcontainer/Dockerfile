@@ -32,6 +32,7 @@ COPY --chown=node:node --chmod=0774 "config/opencode" "/home/node/.opencode"
 RUN \
   apt-get update && \
   apt-get install --yes --no-install-recommends \
+    python3-pip \
     less \
     git \
     gh \
