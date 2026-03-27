@@ -8,3 +8,5 @@
 /home/node/.codex/auth.json
 /home/node/.codex/
 /home/node/.opencode/node_modules/zod/src/v4/classic/tests/
+/home/node/.config/opencode/node_modules/zod/src/v4/classic/tests/
+/home/node/.bun/install/cache/
