@@ -1,0 +1,41 @@
+---
+name: Agent Capabilities
+
+on:
+  pull_request:
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/agent-capabilities.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capability-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent: [claude, codex, opencode]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build devcontainer image
+        run: |
+          docker buildx build \
+            --load \
+            -t agent-platform-test \
+            .devcontainer
+
+      - name: Probe ${{ matrix.agent }} capabilities
+        run: |
+          docker run \
+            --rm \
+            -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
+            agent-platform-test \
+            bash /usr/local/bin/capability-check.sh ${{ matrix.agent }}
