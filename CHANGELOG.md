@@ -45,5 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation (LICENSE, CONTRIBUTING, README, CHANGELOG, and architecture docs).
 - Build scripts and GitHub workflows integration.
 
-[Unreleased]: https://github.com/szachovy/agent-platform/compare/v0.1...HEAD
-[Version 0.1]: https://github.com/szachovy/agent-platform/releases/tag/v0.1
+[Unreleased]: https://github.com/szachovy/agent-platform/compare/0.1...HEAD
+[Version 0.1]: https://github.com/szachovy/agent-platform/releases/tag/0.1
