@@ -12,7 +12,6 @@
     "SessionEnd": []
   },
   "permissions": {
-    "defaultMode": "acceptEdits",
     "deny": [
       "Read(**/.env*)",
       "Edit(**/.env*)",
@@ -51,7 +50,8 @@
     "allow": [
       "WebFetch",
       "WebSearch"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "forceLoginMethod": "claudeai",
   "mcpServers": {
@@ -61,9 +61,7 @@
     }
   },
   "enableAllProjectMcpServers": false,
-  "defaultMode": "dontAsk",
   "allowManagedPermissionRulesOnly": true,
-  "disableBypassPermissionsMode": "disable",
   "allowManagedHooksOnly": true,
   "attribution": {
     "commit": "",
@@ -71,6 +69,7 @@
   },
   "env": {
     "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
     "CLAUDE_CODE_SHELL": "zsh",
     "MAX_THINKING_TOKENS": "32000",
     "CLAUDE_CONFIG_DIR": "/home/node/.claude/"
