@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [Version 0.1]
+
 ### Added
 
 - Context7 MCP server (by Upstash) for live, version-pinned library documentation — configured for Claude Code, Codex, and Opencode as the platform's first MCP server.
@@ -42,3 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dockerfile and `devcontainer.json` for image deployment, installing Claude Code, Codex, GitHub Copilot, and related tooling.
 - Project documentation (LICENSE, CONTRIBUTING, README, CHANGELOG, and architecture docs).
 - Build scripts and GitHub workflows integration.
+
+[Unreleased]: https://github.com/szachovy/agent-platform/compare/v0.1...HEAD
+[Version 0.1]: https://github.com/szachovy/agent-platform/releases/tag/v0.1
