@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Switched Claude Code managed settings to `bypassPermissions` mode, dropped the top-level `defaultMode` and `disableBypassPermissionsMode` keys, and disabled the feedback survey via `CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1`.
 - Hardened managed settings for Claude Code and Codex: stricter permission defaults, credential path deny lists, forced login methods.
 - Firewall script updated to dynamically toggle WebFetch/WebSearch and Codex network settings based on environment flags.
 - Firewall and access checks extended for Opencode managed config permissions and internet-mode web permission toggles.
