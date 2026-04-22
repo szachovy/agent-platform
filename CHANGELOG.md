@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Consolidated the separate `ci-tests.yml` workflow into `deployment.yml`: smoke tests and the capability probe now run against the locally built image *before* it is pushed to GHCR, and the multi-arch manifest (including `:latest` on main/master) is gated on tests passing. Eliminates the `workflow_run` chaining gap (which only triggers on the default branch) and prevents untested images from being published.
+- Tightened workflow permissions to per-job least privilege: top-level `contents: read`, `packages: write` scoped only to jobs that push images.
+
+### Removed
+
+- `ci-tests.yml` workflow (merged into `deployment.yml`).
+
 ## [Version 0.1]
 
 ### Added

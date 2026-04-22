@@ -46,8 +46,7 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   `-- trufflehog-exclude -> Patterns excluded from secret filesystem and env scanning.
 |-- .github
 |   `-- workflows
-|       `-- deployment.yml -> Builds and publishes the devcontainer image to GitHub Actions.
-|       `-- ci-tests.yml -> Mock run devcontainer with smoke tests to GitHub Actions.
+|       `-- deployment.yml -> Builds, scans, smoke-tests, and publishes the devcontainer image via GitHub Actions.
 |-- .gitignore -> Files and directories ignored by Git.
 |-- .pre-commit-config.yaml -> Pre-commit hooks for local checks.
 |-- CHANGELOG.md -> Notable changes by release.
