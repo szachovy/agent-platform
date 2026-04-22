@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
+
+### Changed
+
+- Merged `ci-tests.yml` into `deployment.yml`: smoke tests and capability probe run against the locally built image before push; manifest job gated on all matrix arches passing.
+- Scoped `packages: write` per job.
+
+### Removed
+
+- `ci-tests.yml` (merged into `deployment.yml`).
+
 ## [Version 0.1]
 
 ### Added
