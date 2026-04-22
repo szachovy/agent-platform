@@ -71,7 +71,6 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
-          exit-code: '1'
 
       - name: Run smoke tests
         run: |

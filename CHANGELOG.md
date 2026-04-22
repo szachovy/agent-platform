@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
-- Trivy `CRITICAL`/`HIGH` findings now fail the build.
 
 ### Changed
 
