@@ -28,6 +28,7 @@ COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"
 COPY --chown=node:node --chmod=0774 "config/claude" "/home/node/.claude"
 COPY --chown=node:node --chmod=0774 "config/codex" "/home/node/.codex"
 COPY --chown=node:node --chmod=0774 "config/opencode" "/home/node/.opencode"
+COPY --chown=node:node --chmod=0774 "config/skills" "/usr/local/share/agent-platform/skills"
 
 RUN \
   apt-get update && \
@@ -54,9 +55,9 @@ RUN \
     moreutils && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
-  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/etc/opencode" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
+  mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/etc/opencode" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" "/home/node/.config/opencode" && \
   touch "/commandhistory/.bash_history" && \
-  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
+  chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" "/home/node/.config" && \
   chown --recursive root:root "/etc/claude-code/" "/etc/codex" "/etc/opencode" && \
   mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
@@ -88,7 +89,17 @@ RUN \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
-  ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
+  mkdir --parents "/home/node/.claude/skills" "/home/node/.codex/skills" "/home/node/.config/opencode/skills" && \
+  for skill_dir in /usr/local/share/agent-platform/skills/public/*/ /usr/local/share/agent-platform/skills/private/*/; do \
+    [ -d "$skill_dir" ] || continue; \
+    name="$(basename "$skill_dir")"; \
+    cp --recursive "$skill_dir" "/home/node/.claude/skills/$name"; \
+    cp --recursive "$skill_dir" "/home/node/.codex/skills/$name"; \
+    cp --recursive "$skill_dir" "/home/node/.config/opencode/skills/$name"; \
+  done && \
+  cp /usr/local/share/agent-platform/skills/SKILL.md /home/node/.claude/skills/SKILL.md && \
+  cp /usr/local/share/agent-platform/skills/SKILL.md /home/node/.codex/skills/SKILL.md && \
+  cp /usr/local/share/agent-platform/skills/SKILL.md /home/node/.config/opencode/skills/SKILL.md && \
   mkdir --parents "/home/node/.local/bin" && \
   TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
   curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \

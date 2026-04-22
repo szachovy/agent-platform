@@ -23,7 +23,7 @@ This skill systematically explores a part of the codebase to build deep understa
 
 ### 2. Map the Structure
 
-Use the Explore agent to:
+Use exploration tools to:
 - Find all relevant files using glob patterns
 - Search for key functions, classes, and interfaces
 - Identify dependencies and relationships between components
@@ -62,11 +62,11 @@ Create a structured summary including:
 
 ## Tool Usage
 
-- **Task (Explore agent)**: For broad codebase exploration
+- **Exploration/Task agents**: For broad codebase exploration
 - **Glob**: For finding specific file patterns
 - **Grep**: For searching code patterns and keywords
 - **Read**: For detailed file analysis
-- **WebSearch**: For understanding unfamiliar libraries or patterns
+- **Web search**: For understanding unfamiliar libraries or patterns
 
 ## Output Format
 

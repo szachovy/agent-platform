@@ -22,24 +22,20 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |   |   |-- CLAUDE.md -> Claude agent usage and constraints.
 |   |   |   |-- TOOLS.md -> Tool usage guidance for Claude.
 |   |   |   |-- managed-settings.json -> Managed (immutable) settings applied to Claude.
-|   |   |   |-- rules
-|   |   |   |   `-- security.md -> Claude security rules and constraints.
-|   |   |   `-- skills
-|   |   |       |-- SKILL.md -> Claude skills reference.
-|   |   |       |-- private -> Private Claude skills (not visible in git).
-|   |   |       `-- public -> Public Claude skills (visible in git).
+|   |   |   `-- rules
+|   |   |       `-- security.md -> Claude security rules and constraints.
 |   |   |-- codex
 |   |   |   |-- AGENTS.md -> Codex agent behavior and policies.
 |   |   |   |-- TOOLS.md -> Tool usage guidance for Codex.
-|   |   |   |-- managed_config.toml -> Managed (immutable) Codex configuration.
-|   |   |   `-- skills
-|   |   |       |-- SKILL.md -> Codex skills reference.
-|   |   |       |-- private -> Private Codex skills (not visible in git).
-|   |   |       `-- public -> Public Codex skills (visible in git).
-|   |   `-- opencode
-|   |       |-- AGENTS.md -> Opencode agent behavior and policies.
-|   |       |-- TOOLS.md -> Tool usage guidance for Opencode.
-|   |       `-- managed_config.json -> Managed (immutable) Opencode configuration.
+|   |   |   `-- managed_config.toml -> Managed (immutable) Codex configuration.
+|   |   |-- opencode
+|   |   |   |-- AGENTS.md -> Opencode agent behavior and policies.
+|   |   |   |-- TOOLS.md -> Tool usage guidance for Opencode.
+|   |   |   `-- managed_config.json -> Managed (immutable) Opencode configuration.
+|   |   `-- skills -> Canonical skills catalog distributed to all agents at build time.
+|   |       |-- SKILL.md -> Catalog overview.
+|   |       |-- private -> Private skills (not visible in git).
+|   |       `-- public -> Public skills (visible in git), including the `instructions` skill.
 |   |-- devcontainer.json -> Main devcontainer definition file.
 |   |-- init-firewall.sh -> Initializes container ingress/egress rules.
 |   |-- sudoers -> Sudo policy overrides for the container.

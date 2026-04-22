@@ -85,7 +85,7 @@ jobs:
 
       - name: Probe agent capabilities
         run: |
-          EXPECTED_SKILLS="$(find .devcontainer/config/claude/skills/public -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' | xargs -n1 basename | sort | paste -sd' ')"
+          EXPECTED_SKILLS="$(find .devcontainer/config/skills/public -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' | xargs -n1 basename | sort | paste -sd' ')"
           docker run \
             --rm \
             -e EXPECTED_SKILLS="$EXPECTED_SKILLS" \
