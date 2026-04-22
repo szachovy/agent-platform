@@ -2,20 +2,29 @@
 name: CI Tests
 
 on:
-  pull_request:
-    branches: ["**"]
+  workflow_run:
+    workflows: ["Build and Push Agent Platform Devcontainer"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
   test-devcontainer:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         include:
           - runner: ubuntu-latest
+            arch-suffix: linux-amd64
           - runner: ubuntu-24.04-arm
+            arch-suffix: linux-arm64
     runs-on: ${{ matrix.runner }}
     env:
       AGENT_PLATFORM_ALLOW_INTERNET: "false"
@@ -23,17 +32,23 @@ jobs:
       AGENT_PLATFORM_ALLOW_HOST_NETWORK: "false"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build devcontainer image
+      - name: Pull devcontainer image
         run: |
-          docker buildx build \
-            --load \
-            -t agent-platform-test \
-            .devcontainer
+          set -euo pipefail
+          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
+          BRANCH_TAG="${BRANCH//\//-}"
+          docker pull "${IMAGE_PATH}:${BRANCH_TAG}-${{ matrix.arch-suffix }}"
+          docker tag "${IMAGE_PATH}:${BRANCH_TAG}-${{ matrix.arch-suffix }}" agent-platform-test
 
       - name: Start container and run smoke tests
         run: |
@@ -45,3 +60,38 @@ jobs:
             -e AGENT_PLATFORM_ALLOW_HOST_NETWORK="$AGENT_PLATFORM_ALLOW_HOST_NETWORK" \
             agent-platform-test \
             bash -c 'echo "${SSH_AUTH_SOCK:-}" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh'
+
+  capability-check:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        agent: [claude, codex, opencode]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull devcontainer image
+        run: |
+          set -euo pipefail
+          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
+          BRANCH_TAG="${BRANCH//\//-}"
+          docker pull "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64"
+          docker tag "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64" agent-platform-test
+
+      - name: Probe ${{ matrix.agent }} capabilities
+        run: |
+          docker run \
+            --rm \
+            -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
+            agent-platform-test \
+            bash /usr/local/bin/capability-check.sh ${{ matrix.agent }}

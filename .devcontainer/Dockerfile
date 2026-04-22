@@ -1,13 +1,13 @@
 FROM node:20
 
 ARG TARGETARCH
-ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION=latest
-ARG AGENT_PLATFORM_CODEX_VERSION=latest
-ARG AGENT_PLATFORM_OPENCODE_VERSION=latest
-ARG AGENT_PLATFORM_BACKLOG_MD_VERSION=latest
-ARG AGENT_PLATFORM_CONTEXT7_VERSION=latest
-ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION=1.2.0
-ARG AGENT_PLATFORM_TZ=Europe/Warsaw
+ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
+ARG AGENT_PLATFORM_CODEX_VERSION
+ARG AGENT_PLATFORM_OPENCODE_VERSION
+ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
+ARG AGENT_PLATFORM_CONTEXT7_VERSION
+ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
+ARG AGENT_PLATFORM_TZ
 
 ENV \
   NPM_CONFIG_PREFIX="/usr/local/share/npm-global" \
@@ -90,13 +90,7 @@ RUN \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
   ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
   mkdir --parents "/home/node/.local/bin" && \
-  TRUFFLEHOG_VERSION="" && \
-  for _try in 1 2 3; do \
-    TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
-    [ -n "$TRUFFLEHOG_VERSION" ] && [ "$TRUFFLEHOG_VERSION" != "null" ] && break; \
-    sleep 5; \
-  done && \
-  [ -n "$TRUFFLEHOG_VERSION" ] && [ "$TRUFFLEHOG_VERSION" != "null" ] && \
+  TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
   curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \
   mv /tmp/trufflehog /home/node/.local/bin/trufflehog
 

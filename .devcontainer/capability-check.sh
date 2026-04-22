@@ -2,12 +2,7 @@
 
 set -o pipefail
 
-agent="${1:-}"
-if [[ -z "$agent" ]]; then
-    echo "usage: capability-check.sh <claude|codex|opencode>" >&2
-    exit 2
-fi
-
+agent="$1"
 failed=0
 
 pass() { echo "PASS: $*"; }
@@ -28,8 +23,8 @@ check_mcp() {
     local agent="$1"
     local out
     case "$agent" in
-        claude)  out=$(claude mcp list 2>&1 | strip_ansi) ;;
-        codex)   out=$(codex mcp list 2>&1 | strip_ansi) ;;
+        claude)   out=$(claude mcp list 2>&1 | strip_ansi) ;;
+        codex)    out=$(codex mcp list 2>&1 | strip_ansi) ;;
         opencode) out=$(opencode mcp list 2>&1 | strip_ansi) ;;
     esac
     for name in "${EXPECTED_MCPS[@]}"; do
@@ -62,7 +57,7 @@ check_plugins() {
             ;;
     esac
     if [[ ${#EXPECTED_PLUGINS[@]} -eq 0 ]]; then
-        skip "${agent}/plugin: no expected plugins yet (TASK-140 / issue #16)"
+        skip "${agent}/plugin: no expected plugins yet"
         return
     fi
     local out
@@ -104,18 +99,8 @@ check_skills() {
 }
 
 echo "=== capability-check: ${agent} ==="
-
-case "$agent" in
-    claude|codex|opencode)
-        check_mcp "$agent"
-        check_plugins "$agent"
-        check_skills "$agent"
-        ;;
-    *)
-        fail "unknown agent: ${agent}"
-        exit 2
-        ;;
-esac
-
+check_mcp "$agent"
+check_plugins "$agent"
+check_skills "$agent"
 echo "=== capability-check: ${agent} done (failed=${failed}) ==="
 exit "$failed"
