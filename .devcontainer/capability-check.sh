@@ -10,7 +10,8 @@ expected_mcp_opencode="$(jq -r '.mcp // {} | keys | join(" ")' /etc/opencode/man
 rc=0
 
 check_agent_skills_mcp_plugins() {
-    for name in $(eval echo "\$expected_mcp_${1}"); do
+    mcp_var="expected_mcp_${1}"
+    for name in ${!mcp_var}; do
         if "$1" mcp list 2>&1 | grep -qi "$name"; then
             echo "PASS: ${1} mcp ${name} available"
         else
@@ -30,9 +31,8 @@ check_agent_skills_mcp_plugins() {
         done
     fi
 
-    [[ "$1" == "opencode" ]] && return
     for name in ${EXPECTED_SKILLS}; do
-        if [[ -f "/home/node/.${1}/skills/${name}/SKILL.md" ]]; then
+        if [[ -f "${HOME}/.${1}/skills/${name}/SKILL.md" ]]; then
             echo "PASS: ${1} skill ${name} available"
         else
             echo "FAIL: ${1} skill ${name} not available"
