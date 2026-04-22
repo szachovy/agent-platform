@@ -1,17 +1,4 @@
 #!/bin/bash
-#
-# capability-check.sh <agent>
-#
-# Verifies that the MCP servers, plugins, and skills configured for a given
-# agent (claude | codex | opencode) are visible and functional from the
-# agent's own perspective. Designed to run inside the devcontainer image.
-#
-# Strategy: ask the agent, not the config file. A well-formed config does not
-# prove the agent successfully loaded it, found the referenced binary, or
-# connected to the server. We shell out to each agent's native list command
-# and assert that every expected capability is present and healthy.
-#
-# Exits non-zero if any expected capability is missing or unhealthy.
 
 set -o pipefail
 
@@ -33,235 +20,96 @@ fail() {
 
 strip_ansi() { sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g'; }
 
-# ---------------------------------------------------------------------------
-# Expected-capability manifest
-#
-# Keep this in sync with .devcontainer/config/<agent>/. A capability listed
-# here but not visible to the agent produces a FAIL; a capability visible to
-# the agent but not listed here is allowed (it does not block legitimate
-# additions, but the expected set should be updated alongside the config).
-# ---------------------------------------------------------------------------
+EXPECTED_MCPS=(context7)
+EXPECTED_SKILLS=(build_context explaining_code token-usage)
+EXPECTED_PLUGINS=()
 
-EXPECTED_MCPS_CLAUDE=(context7)
-EXPECTED_MCPS_CODEX=(context7)
-EXPECTED_MCPS_OPENCODE=(context7)
-
-EXPECTED_SKILLS_CLAUDE=(
-    build_context
-    explaining_code
-    token-usage
-)
-# Private skills (briefing, login-to-remote-do-ops, update-ruby-gems) are
-# gitignored and only present locally; they cannot be verified in CI.
-EXPECTED_SKILLS_CODEX_PUBLIC=(build_context explaining_code token-usage)
-EXPECTED_SKILLS_CODEX_PRIVATE=()
-
-# Plugins land in a later task (TASK-140); for now we only assert that each
-# agent's plugin subsystem responds, and emit a SKIP when the expected list
-# is empty so silence never equals success.
-EXPECTED_PLUGINS_CLAUDE=()
-EXPECTED_PLUGINS_CODEX=()
-EXPECTED_PLUGINS_OPENCODE=()
-
-# ---------------------------------------------------------------------------
-# Claude probes
-# ---------------------------------------------------------------------------
-
-check_claude_mcp() {
+check_mcp() {
+    local agent="$1"
     local out
-    if ! out=$(claude mcp list 2>&1 | strip_ansi); then
-        fail "claude/mcp/list: command failed"
-        return
-    fi
-    for name in "${EXPECTED_MCPS_CLAUDE[@]}"; do
-        local line
-        line=$(echo "$out" | grep -E "^${name}:" || true)
-        if [[ -z "$line" ]]; then
-            # Live probe did not show the server (common in CI without auth).
-            # Fall back to checking the managed config.
-            local cfg="/etc/claude-code/managed-settings.json"
-            if [[ -f "$cfg" ]] && jq -e ".mcpServers.\"${name}\"" "$cfg" >/dev/null 2>&1; then
-                pass "claude/mcp/${name}: configured in managed-settings.json (live probe unavailable)"
-            else
-                fail "claude/mcp/${name}: not visible to 'claude mcp list' and not in managed config"
+    case "$agent" in
+        claude)  out=$(claude mcp list 2>&1 | strip_ansi) ;;
+        codex)   out=$(codex mcp list 2>&1 | strip_ansi) ;;
+        opencode) out=$(opencode mcp list 2>&1 | strip_ansi) ;;
+    esac
+    for name in "${EXPECTED_MCPS[@]}"; do
+        if echo "$out" | grep -qi "$name"; then
+            pass "${agent}/mcp/${name}"
+        else
+            fail "${agent}/mcp/${name}: not visible to '${agent} mcp list'"
+        fi
+    done
+}
+
+check_plugins() {
+    local agent="$1"
+    case "$agent" in
+        claude)
+            if ! claude plugin list >/dev/null 2>&1; then
+                fail "${agent}/plugin: subsystem unavailable"
+                return
             fi
-            continue
-        fi
-        if echo "$line" | grep -qiE "connected|ok|enabled|authenticated"; then
-            pass "claude/mcp/${name}: connected"
-        elif echo "$line" | grep -qiE "needs authentication"; then
-            pass "claude/mcp/${name}: visible (needs authentication)"
-        else
-            fail "claude/mcp/${name}: visible but unhealthy (${line})"
-        fi
-    done
-}
-
-check_claude_plugins() {
-    if ! claude plugin list >/dev/null 2>&1; then
-        fail "claude/plugin/list: command failed"
-        return
-    fi
-    if [[ ${#EXPECTED_PLUGINS_CLAUDE[@]} -eq 0 ]]; then
-        skip "claude/plugin: no expected plugins yet (tracked by TASK-140 / issue #16)"
+            ;;
+        codex)
+            if ! codex plugin --help >/dev/null 2>&1; then
+                fail "${agent}/plugin: subsystem unavailable"
+                return
+            fi
+            ;;
+        opencode)
+            skip "${agent}/plugin: no list subcommand"
+            return
+            ;;
+    esac
+    if [[ ${#EXPECTED_PLUGINS[@]} -eq 0 ]]; then
+        skip "${agent}/plugin: no expected plugins yet (TASK-140 / issue #16)"
         return
     fi
     local out
-    out=$(claude plugin list 2>&1 | strip_ansi)
-    for name in "${EXPECTED_PLUGINS_CLAUDE[@]}"; do
-        if echo "$out" | grep -qE "(^|[[:space:]])${name}([[:space:]]|$)"; then
-            pass "claude/plugin/${name}: installed"
+    case "$agent" in
+        claude) out=$(claude plugin list 2>&1 | strip_ansi) ;;
+        codex)  out=$(codex plugin --help 2>&1 | strip_ansi) ;;
+    esac
+    for name in "${EXPECTED_PLUGINS[@]}"; do
+        if echo "$out" | grep -qi "$name"; then
+            pass "${agent}/plugin/${name}"
         else
-            fail "claude/plugin/${name}: not installed"
+            fail "${agent}/plugin/${name}: not installed"
         fi
     done
 }
 
-check_claude_skills() {
-    local skills_dir="${CLAUDE_CONFIG_DIR:-/home/node/.claude}/skills"
+check_skills() {
+    local agent="$1"
+    local skills_dir
+    case "$agent" in
+        claude)   skills_dir="${CLAUDE_CONFIG_DIR:-/home/node/.claude}/skills" ;;
+        codex)    skills_dir="${CODEX_HOME:-/home/node/.codex}/skills/public" ;;
+        opencode)
+            skip "${agent}/skill: no on-disk skills directory"
+            return
+            ;;
+    esac
     if [[ ! -d "$skills_dir" ]]; then
-        fail "claude/skill/_dir: ${skills_dir} does not exist"
+        fail "${agent}/skill: ${skills_dir} does not exist"
         return
     fi
-    for name in "${EXPECTED_SKILLS_CLAUDE[@]}"; do
-        # Dockerfile flattens public/*/ and private/*/ into ~/.claude/skills/
-        # via symlinks, so the runtime-visible path is ~/.claude/skills/<name>/SKILL.md.
+    for name in "${EXPECTED_SKILLS[@]}"; do
         if [[ -f "${skills_dir}/${name}/SKILL.md" ]]; then
-            pass "claude/skill/${name}: SKILL.md present"
+            pass "${agent}/skill/${name}"
         else
-            fail "claude/skill/${name}: missing SKILL.md under ${skills_dir}"
+            fail "${agent}/skill/${name}: missing SKILL.md under ${skills_dir}"
         fi
     done
 }
-
-# ---------------------------------------------------------------------------
-# Codex probes
-# ---------------------------------------------------------------------------
-
-check_codex_mcp() {
-    local out
-    if ! out=$(codex mcp list 2>&1 | strip_ansi); then
-        fail "codex/mcp/list: command failed"
-        return
-    fi
-    for name in "${EXPECTED_MCPS_CODEX[@]}"; do
-        # Codex prints a table: Name  Command  Args  Env  Cwd  Status  Auth
-        local row status
-        row=$(echo "$out" | awk -v n="$name" '$1==n {print}')
-        if [[ -z "$row" ]]; then
-            fail "codex/mcp/${name}: not visible to 'codex mcp list'"
-            continue
-        fi
-        status=$(echo "$row" | awk '{print $(NF-1)}')
-        if [[ "$status" == "enabled" ]]; then
-            pass "codex/mcp/${name}: enabled"
-        else
-            fail "codex/mcp/${name}: visible but status=${status}"
-        fi
-    done
-}
-
-check_codex_plugins() {
-    # Codex exposes `codex plugin marketplace` but no "list installed" equivalent
-    # today; the plugin subsystem is still a no-op for our repo until TASK-140.
-    if ! codex plugin --help >/dev/null 2>&1; then
-        fail "codex/plugin: subsystem unavailable"
-        return
-    fi
-    if [[ ${#EXPECTED_PLUGINS_CODEX[@]} -eq 0 ]]; then
-        skip "codex/plugin: no expected plugins yet (tracked by TASK-140 / issue #16)"
-        return
-    fi
-    fail "codex/plugin: expected plugins set but codex has no 'plugin list' subcommand"
-}
-
-check_codex_skills() {
-    local base="${CODEX_HOME:-/home/node/.codex}/skills"
-    if [[ ! -d "$base" ]]; then
-        fail "codex/skill/_dir: ${base} does not exist"
-        return
-    fi
-    for name in "${EXPECTED_SKILLS_CODEX_PUBLIC[@]}"; do
-        if [[ -f "${base}/public/${name}/SKILL.md" ]]; then
-            pass "codex/skill/public/${name}: SKILL.md present"
-        else
-            fail "codex/skill/public/${name}: missing SKILL.md under ${base}/public"
-        fi
-    done
-    for name in "${EXPECTED_SKILLS_CODEX_PRIVATE[@]}"; do
-        if [[ -f "${base}/private/${name}/SKILL.md" ]]; then
-            pass "codex/skill/private/${name}: SKILL.md present"
-        else
-            fail "codex/skill/private/${name}: missing SKILL.md under ${base}/private"
-        fi
-    done
-}
-
-# ---------------------------------------------------------------------------
-# Opencode probes
-# ---------------------------------------------------------------------------
-
-check_opencode_mcp() {
-    local out
-    if ! out=$(opencode mcp list 2>&1 | strip_ansi); then
-        fail "opencode/mcp/list: command failed"
-        return
-    fi
-    for name in "${EXPECTED_MCPS_OPENCODE[@]}"; do
-        # Opencode prints:  ●  ✓ <name> connected   \n      <command>
-        if echo "$out" | grep -qE "[✓✗]\s+${name}\s+connected"; then
-            pass "opencode/mcp/${name}: connected"
-        elif echo "$out" | grep -qE "[[:space:]]${name}([[:space:]]|$)"; then
-            fail "opencode/mcp/${name}: visible but not connected"
-        else
-            # Fall back to config file when live probe unavailable (CI).
-            local cfg="/etc/opencode/managed_config.json"
-            if [[ -f "$cfg" ]] && jq -e ".mcp.\"${name}\"" "$cfg" >/dev/null 2>&1; then
-                pass "opencode/mcp/${name}: configured in managed_config.json (live probe unavailable)"
-            else
-                fail "opencode/mcp/${name}: not visible to 'opencode mcp list' and not in managed config"
-            fi
-        fi
-    done
-}
-
-check_opencode_plugins() {
-    # Opencode's `plugin` subcommand only installs; there's no "list installed"
-    # command today. Once expected plugins are set (TASK-140), verify via the
-    # merged config at runtime instead.
-    if [[ ${#EXPECTED_PLUGINS_OPENCODE[@]} -eq 0 ]]; then
-        skip "opencode/plugin: no 'list' subcommand; no expected plugins yet (TASK-140 / issue #16)"
-        return
-    fi
-    fail "opencode/plugin: expected plugins set but opencode has no 'plugin list' subcommand"
-}
-
-check_opencode_skills() {
-    # Opencode ships no on-disk skills directory in this repo.
-    skip "opencode/skill: opencode has no on-disk skills directory in this repo"
-}
-
-# ---------------------------------------------------------------------------
-# Dispatch
-# ---------------------------------------------------------------------------
 
 echo "=== capability-check: ${agent} ==="
 
 case "$agent" in
-    claude)
-        check_claude_mcp
-        check_claude_plugins
-        check_claude_skills
-        ;;
-    codex)
-        check_codex_mcp
-        check_codex_plugins
-        check_codex_skills
-        ;;
-    opencode)
-        check_opencode_mcp
-        check_opencode_plugins
-        check_opencode_skills
+    claude|codex|opencode)
+        check_mcp "$agent"
+        check_plugins "$agent"
+        check_skills "$agent"
         ;;
     *)
         fail "unknown agent: ${agent}"

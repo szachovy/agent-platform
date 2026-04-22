@@ -10,6 +10,11 @@ on:
 
 permissions:
   contents: read
+  packages: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
   capability-check:
@@ -20,17 +25,23 @@ jobs:
         agent: [claude, codex, opencode]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build devcontainer image
+      - name: Pull devcontainer image
         run: |
-          docker buildx build \
-            --load \
-            -t agent-platform-test \
-            .devcontainer
+          set -euo pipefail
+          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          BRANCH_TAG="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          BRANCH_TAG="${BRANCH_TAG//\//-}"
+          docker pull "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64"
+          docker tag "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64" agent-platform-test
 
       - name: Probe ${{ matrix.agent }} capabilities
         run: |
