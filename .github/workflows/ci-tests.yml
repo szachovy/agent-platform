@@ -50,7 +50,7 @@ jobs:
           docker pull "${IMAGE_PATH}:${BRANCH_TAG}-${{ matrix.arch-suffix }}"
           docker tag "${IMAGE_PATH}:${BRANCH_TAG}-${{ matrix.arch-suffix }}" agent-platform-test
 
-      - name: Start container and run smoke tests
+      - name: Run smoke tests
         run: |
           docker run \
             --rm \
@@ -61,37 +61,13 @@ jobs:
             agent-platform-test \
             bash -c 'echo "${SSH_AUTH_SOCK:-}" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh'
 
-  capability-check:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        agent: [claude, codex, opencode]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Log in to GHCR
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull devcontainer image
+      - name: Probe agent capabilities
+        if: ${{ matrix.arch-suffix == 'linux-amd64' }}
         run: |
-          set -euo pipefail
-          IMAGE_PATH="$(echo "${REGISTRY}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
-          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
-          BRANCH_TAG="${BRANCH//\//-}"
-          docker pull "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64"
-          docker tag "${IMAGE_PATH}:${BRANCH_TAG}-linux-amd64" agent-platform-test
-
-      - name: Probe ${{ matrix.agent }} capabilities
-        run: |
-          docker run \
-            --rm \
-            -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
-            agent-platform-test \
-            bash /usr/local/bin/capability-check.sh ${{ matrix.agent }}
+          for agent in claude codex opencode; do
+            docker run \
+              --rm \
+              -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
+              agent-platform-test \
+              bash /usr/local/bin/capability-check.sh "$agent"
+          done

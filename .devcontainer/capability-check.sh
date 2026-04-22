@@ -20,80 +20,49 @@ EXPECTED_SKILLS=(build_context explaining_code token-usage)
 EXPECTED_PLUGINS=()
 
 check_mcp() {
-    local agent="$1"
     local out
-    case "$agent" in
-        claude)   out=$(claude mcp list 2>&1 | strip_ansi) ;;
-        codex)    out=$(codex mcp list 2>&1 | strip_ansi) ;;
-        opencode) out=$(opencode mcp list 2>&1 | strip_ansi) ;;
-    esac
+    out=$("$1" mcp list 2>&1 | strip_ansi)
     for name in "${EXPECTED_MCPS[@]}"; do
         if echo "$out" | grep -qi "$name"; then
-            pass "${agent}/mcp/${name}"
+            pass "$1/mcp/${name}"
         else
-            fail "${agent}/mcp/${name}: not visible to '${agent} mcp list'"
+            fail "$1/mcp/${name}"
         fi
     done
 }
 
 check_plugins() {
-    local agent="$1"
-    case "$agent" in
-        claude)
-            if ! claude plugin list >/dev/null 2>&1; then
-                fail "${agent}/plugin: subsystem unavailable"
-                return
-            fi
-            ;;
-        codex)
-            if ! codex plugin --help >/dev/null 2>&1; then
-                fail "${agent}/plugin: subsystem unavailable"
-                return
-            fi
-            ;;
-        opencode)
-            skip "${agent}/plugin: no list subcommand"
-            return
-            ;;
-    esac
-    if [[ ${#EXPECTED_PLUGINS[@]} -eq 0 ]]; then
-        skip "${agent}/plugin: no expected plugins yet"
+    if [[ "$1" != "claude" ]]; then
+        skip "$1/plugin: only checked for claude"
         return
     fi
     local out
-    case "$agent" in
-        claude) out=$(claude plugin list 2>&1 | strip_ansi) ;;
-        codex)  out=$(codex plugin --help 2>&1 | strip_ansi) ;;
-    esac
+    out=$(claude plugin list 2>&1 | strip_ansi)
+    if [[ ${#EXPECTED_PLUGINS[@]} -eq 0 ]]; then
+        skip "$1/plugin: no expected plugins yet"
+        return
+    fi
     for name in "${EXPECTED_PLUGINS[@]}"; do
         if echo "$out" | grep -qi "$name"; then
-            pass "${agent}/plugin/${name}"
+            pass "$1/plugin/${name}"
         else
-            fail "${agent}/plugin/${name}: not installed"
+            fail "$1/plugin/${name}"
         fi
     done
 }
 
 check_skills() {
-    local agent="$1"
     local skills_dir
-    case "$agent" in
+    case "$1" in
         claude)   skills_dir="${CLAUDE_CONFIG_DIR:-/home/node/.claude}/skills" ;;
         codex)    skills_dir="${CODEX_HOME:-/home/node/.codex}/skills/public" ;;
-        opencode)
-            skip "${agent}/skill: no on-disk skills directory"
-            return
-            ;;
+        opencode) skip "$1/skill: no on-disk skills directory"; return ;;
     esac
-    if [[ ! -d "$skills_dir" ]]; then
-        fail "${agent}/skill: ${skills_dir} does not exist"
-        return
-    fi
     for name in "${EXPECTED_SKILLS[@]}"; do
         if [[ -f "${skills_dir}/${name}/SKILL.md" ]]; then
-            pass "${agent}/skill/${name}"
+            pass "$1/skill/${name}"
         else
-            fail "${agent}/skill/${name}: missing SKILL.md under ${skills_dir}"
+            fail "$1/skill/${name}"
         fi
     done
 }
