@@ -9,39 +9,23 @@ expected_mcp_opencode="$(jq -r '.mcp // {} | keys | join(" ")' /etc/opencode/man
 
 rc=0
 
-check_agent_skills_mcp_plugins() {
-    mcp_var="expected_mcp_${1}"
-    for name in ${!mcp_var}; do
-        if "$1" mcp list 2>&1 | grep -qi "$name"; then
-            echo "PASS: ${1} mcp ${name} available"
-        else
-            echo "FAIL: ${1} mcp ${name} not available"
-            rc=1
-        fi
-    done
-
-    if [[ "$1" == "claude" ]]; then
-        for name in ${expected_plugins_claude}; do
-            if claude plugin list 2>&1 | grep -qi "$name"; then
-                echo "PASS: ${1} plugin ${name} available"
-            else
-                echo "FAIL: ${1} plugin ${name} not available"
-                rc=1
-            fi
-        done
-    fi
-
-    for name in ${EXPECTED_SKILLS}; do
-        if [[ -f "${HOME}/.${1}/skills/${name}/SKILL.md" ]]; then
-            echo "PASS: ${1} skill ${name} available"
-        else
-            echo "FAIL: ${1} skill ${name} not available"
-            rc=1
-        fi
+check() {
+    agent=$1 kind=$2
+    shift 2
+    for name in "$@"; do
+        case "$kind" in
+            mcp)    "$agent" mcp list 2>&1 | grep -qi "$name" ;;
+            plugin) "$agent" plugin list 2>&1 | grep -qi "$name" ;;
+            skill)  [[ -f "${HOME}/.${agent}/skills/${name}/SKILL.md" ]] ;;
+        esac && echo "PASS: ${agent} ${kind} ${name} available" || { echo "FAIL: ${agent} ${kind} ${name} not available"; rc=1; }
     done
 }
 
-check_agent_skills_mcp_plugins claude
-check_agent_skills_mcp_plugins codex
-check_agent_skills_mcp_plugins opencode
+for agent in claude codex opencode; do
+    expected_mcps="expected_mcp_${agent}"
+    check "$agent" mcp ${!expected_mcps}
+    check "$agent" skill ${EXPECTED_SKILLS}
+done
+check claude plugin ${expected_plugins_claude}
+
 exit "$rc"

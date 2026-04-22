@@ -9,18 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Per-agent capability probe (`.devcontainer/capability-check.sh`) that verifies each configured MCP server, plugin, and skill is actually visible to Claude, Codex, and opencode at runtime. Expected MCPs/plugins are derived from the in-image managed configs; expected skills are derived from the repo's skills catalog at workflow time. Skill presence is now checked for all three agents.
-- Trivy `CRITICAL`/`HIGH` findings now fail the pipeline (`exit-code: 1`) so vulnerable images cannot be published.
+- Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
+- Trivy `CRITICAL`/`HIGH` findings now fail the build.
 
 ### Changed
 
-- Consolidated the separate `ci-tests.yml` workflow into `deployment.yml`. Build, Trivy scan, smoke tests, and capability probe now run against the locally built image; images are exported as artifacts and pushed only by a separate `publish` job that runs after **every** matrix arch (amd64 and arm64) has passed. Multi-arch manifest and `:latest` promotion are published by the same job. Eliminates the `workflow_run` default-branch-only trigger gap and prevents untested or half-matrix images from being published.
-- Tightened workflow permissions to per-job least privilege: top-level `contents: read`; `packages: write` scoped only to the `publish` job.
-- Renamed workflow to `Build, Test, and Publish Agent Platform Devcontainer` to reflect its scope.
+- Merged `ci-tests.yml` into `deployment.yml`: smoke tests and capability probe run against the locally built image before push; manifest job gated on all matrix arches passing.
+- Scoped `packages: write` per job.
 
 ### Removed
 
-- `ci-tests.yml` workflow (merged into `deployment.yml`).
+- `ci-tests.yml` (merged into `deployment.yml`).
 
 ## [Version 0.1]
 
