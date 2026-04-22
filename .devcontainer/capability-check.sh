@@ -2,74 +2,46 @@
 
 set -o pipefail
 
-agent="$1"
-failed=0
+expected_mcp_claude="$(jq -r '.mcpServers // {} | keys | join(" ")' /etc/claude-code/managed-settings.json)"
+expected_plugins_claude="$(jq -r '(.enabledPlugins // .plugins // {}) | keys | join(" ")' /etc/claude-code/managed-settings.json)"
+expected_mcp_codex="$(grep -oE '^\[mcp_servers\.[^]]+\]' /etc/codex/managed_config.toml | sed -E 's/^\[mcp_servers\.(.+)\]$/\1/' | paste -sd' ')"
+expected_mcp_opencode="$(jq -r '.mcp // {} | keys | join(" ")' /etc/opencode/managed_config.json)"
 
-pass() { echo "PASS: $*"; }
-skip() { echo "SKIP: $*"; }
-fail() {
-    echo "FAIL: $*"
-    echo "::error title=Missing capability::$*"
-    failed=1
-}
+rc=0
 
-strip_ansi() { sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g'; }
-
-EXPECTED_MCPS=(context7)
-EXPECTED_SKILLS=(build_context explaining_code token-usage)
-EXPECTED_PLUGINS=()
-
-check_mcp() {
-    local out
-    out=$("$1" mcp list 2>&1 | strip_ansi)
-    for name in "${EXPECTED_MCPS[@]}"; do
-        if echo "$out" | grep -qi "$name"; then
-            pass "$1/mcp/${name}"
+check_agent_skills_mcp_plugins() {
+    for name in $(eval echo "\$expected_mcp_${1}"); do
+        if "$1" mcp list 2>&1 | grep -qi "$name"; then
+            echo "PASS: ${1} mcp ${name} available"
         else
-            fail "$1/mcp/${name}"
+            echo "FAIL: ${1} mcp ${name} not available"
+            rc=1
         fi
     done
-}
 
-check_plugins() {
-    if [[ "$1" != "claude" ]]; then
-        skip "$1/plugin: only checked for claude"
-        return
+    if [[ "$1" == "claude" ]]; then
+        for name in ${expected_plugins_claude}; do
+            if claude plugin list 2>&1 | grep -qi "$name"; then
+                echo "PASS: ${1} plugin ${name} available"
+            else
+                echo "FAIL: ${1} plugin ${name} not available"
+                rc=1
+            fi
+        done
     fi
-    local out
-    out=$(claude plugin list 2>&1 | strip_ansi)
-    if [[ ${#EXPECTED_PLUGINS[@]} -eq 0 ]]; then
-        skip "$1/plugin: no expected plugins yet"
-        return
-    fi
-    for name in "${EXPECTED_PLUGINS[@]}"; do
-        if echo "$out" | grep -qi "$name"; then
-            pass "$1/plugin/${name}"
+
+    [[ "$1" == "opencode" ]] && return
+    for name in ${EXPECTED_SKILLS}; do
+        if [[ -f "/home/node/.${1}/skills/${name}/SKILL.md" ]]; then
+            echo "PASS: ${1} skill ${name} available"
         else
-            fail "$1/plugin/${name}"
+            echo "FAIL: ${1} skill ${name} not available"
+            rc=1
         fi
     done
 }
 
-check_skills() {
-    local skills_dir
-    case "$1" in
-        claude)   skills_dir="${CLAUDE_CONFIG_DIR:-/home/node/.claude}/skills" ;;
-        codex)    skills_dir="${CODEX_HOME:-/home/node/.codex}/skills/public" ;;
-        opencode) skip "$1/skill: no on-disk skills directory"; return ;;
-    esac
-    for name in "${EXPECTED_SKILLS[@]}"; do
-        if [[ -f "${skills_dir}/${name}/SKILL.md" ]]; then
-            pass "$1/skill/${name}"
-        else
-            fail "$1/skill/${name}"
-        fi
-    done
-}
-
-echo "=== capability-check: ${agent} ==="
-check_mcp "$agent"
-check_plugins "$agent"
-check_skills "$agent"
-echo "=== capability-check: ${agent} done (failed=${failed}) ==="
-exit "$failed"
+check_agent_skills_mcp_plugins claude
+check_agent_skills_mcp_plugins codex
+check_agent_skills_mcp_plugins opencode
+exit "$rc"

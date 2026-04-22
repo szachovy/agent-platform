@@ -64,10 +64,10 @@ jobs:
       - name: Probe agent capabilities
         if: ${{ matrix.arch-suffix == 'linux-amd64' }}
         run: |
-          for agent in claude codex opencode; do
-            docker run \
-              --rm \
-              -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
-              agent-platform-test \
-              bash /usr/local/bin/capability-check.sh "$agent"
-          done
+          EXPECTED_SKILLS="$(find .devcontainer/config/claude/skills/public -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' | xargs -n1 basename | sort | paste -sd' ')"
+          docker run \
+            --rm \
+            -e EXPECTED_SKILLS="$EXPECTED_SKILLS" \
+            -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
+            agent-platform-test \
+            bash /usr/local/bin/capability-check.sh
