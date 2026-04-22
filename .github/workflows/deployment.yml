@@ -84,7 +84,6 @@ jobs:
             bash -c 'echo "${SSH_AUTH_SOCK:-}" > /tmp/.vscode-ssh-auth-sock && sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/access.sh'
 
       - name: Probe agent capabilities
-        if: ${{ matrix.arch-suffix == 'linux-amd64' }}
         run: |
           EXPECTED_SKILLS="$(find .devcontainer/config/claude/skills/public -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' | xargs -n1 basename | sort | paste -sd' ')"
           docker run \
