@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `instructions` public skill documenting installed plugins, MCP servers, and skills with invocation guidance.
 - Five curated Claude plugins from the `claude-plugins-official` marketplace, pre-enabled via managed settings: `frontend-design`, `playwright`, `feature-dev`, `ralph-loop`, `context7`.
 - System-wide Chromium (via apt) and `@playwright/mcp` (pinned by new `AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION` build arg) so the Playwright plugin has a usable browser. Dockerfile exports `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` and `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to skip runtime browser downloads.
+- `@radleta/backlog-md-mcp` MCP server (`backlog-md`) registered for Claude, Codex, and Opencode — exposes Backlog.md task/draft/doc/decision/board tools via typed MCP schemas so embedded CLI docs are no longer needed.
+- `@beads/bd` CLI installed globally for all three agents (graph issue tracker / agentic memory system from https://github.com/gastownhall/beads); shell-capable agents use it directly per upstream guidance. New build args `AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION` and `AGENT_PLATFORM_BEADS_VERSION`.
+- `/etc/claude-code/managed-mcp.json` managed MCP config for Claude (the documented location for enterprise-deployed MCP servers). `claude mcp list` reads from this file, not from `mcpServers` in `managed-settings.json`.
+- `OPENCODE_CONFIG=/etc/opencode/managed_config.json` exported as a container-wide environment variable so the managed Opencode config is picked up under bash (capability-check) as well as zsh (interactive sessions).
 
 ### Changed
 
@@ -23,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `deployment.yml` now resolves `EXPECTED_SKILLS` from the canonical catalog.
 - Slimmed the always-loaded agent root files to a short numbered behavioral preamble modeled on [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills/blob/main/CLAUDE.md) and deduplicated them into a single canonical `AGENTS.md` (plus canonical `TOOLS.md` and `SECURITY.md`) under `.devcontainer/config/shared/`, distributed to all three agents by the Dockerfile via symlinks. Inline security sections previously embedded in Codex and Opencode `AGENTS.md` were extracted into the canonical `SECURITY.md`.
 - Claude receives Context7 via the `context7` plugin instead of the standalone `@upstash/context7-mcp` MCP server. Codex and Opencode continue to use the standalone MCP.
+- Backlog.md integration moved from per-agent CLI + embedded markdown instructions to a dedicated `backlog-md` MCP server.
 
 ### Removed
 

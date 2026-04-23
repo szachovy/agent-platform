@@ -5,6 +5,8 @@ ARG AGENT_PLATFORM_CLAUDE_CODE_VERSION
 ARG AGENT_PLATFORM_CODEX_VERSION
 ARG AGENT_PLATFORM_OPENCODE_VERSION
 ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
+ARG AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION
+ARG AGENT_PLATFORM_BEADS_VERSION
 ARG AGENT_PLATFORM_CONTEXT7_VERSION
 ARG AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
@@ -22,7 +24,8 @@ ENV \
   LANGUAGE='en_US:en' \
   LC_ALL='en_US.UTF-8' \
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="1" \
-  PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium"
+  PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium" \
+  OPENCODE_CONFIG="/etc/opencode/managed_config.json"
 
 COPY --chmod=0555 "init-firewall.sh" "/usr/local/bin/init-firewall.sh"
 COPY --chmod=0555 "access.sh" "/usr/local/bin/access.sh"
@@ -64,10 +67,11 @@ RUN \
   chown --recursive node:node "/usr/local/share" "/workspace" "/commandhistory" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
   chown --recursive root:root "/etc/claude-code/" "/etc/codex" "/etc/opencode" && \
   mv "/home/node/.claude/managed-settings.json" "/etc/claude-code/" && \
+  mv "/home/node/.claude/managed-mcp.json" "/etc/claude-code/" && \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
   mv "/home/node/.opencode/managed_config.json" "/etc/opencode/" && \
-  chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
-  chown root:root "/etc/claude-code/managed-settings.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
+  chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/claude-code/managed-mcp.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
+  chown root:root "/etc/claude-code/managed-settings.json" "/etc/claude-code/managed-mcp.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
   ln --symbolic "/etc/opencode/managed_config.json" "/home/node/.opencode/managed_config.json"
 
 USER node
@@ -92,6 +96,8 @@ RUN \
   npm install --global "@openai/codex@${AGENT_PLATFORM_CODEX_VERSION}" && \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
+  npm install --global "@radleta/backlog-md-mcp@${AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION}" && \
+  npm install --global "@beads/bd@${AGENT_PLATFORM_BEADS_VERSION}" && \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
   npm install --global "@playwright/mcp@${AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION}" && \
   rm --recursive --force "/home/node/.claude/plugins" && \

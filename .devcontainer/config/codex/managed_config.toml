@@ -21,3 +21,7 @@ set = { CODEX_HOME = "/home/node/.codex" }
 [mcp_servers.context7]
 command = "context7-mcp"
 args = []
+
+[mcp_servers.backlog-md]
+command = "backlog-mcp"
+args = ["start"]

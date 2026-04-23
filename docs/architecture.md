@@ -18,7 +18,8 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |-- access.sh -> Runtime access test setup for the container.
 |   |-- config
 |   |   |-- claude
-|   |   |   `-- managed-settings.json -> Managed (immutable) settings applied to Claude.
+|   |   |   |-- managed-settings.json -> Managed (immutable) settings applied to Claude.
+|   |   |   `-- managed-mcp.json -> Managed (immutable) MCP server definitions for Claude (deployed to /etc/claude-code/).
 |   |   |-- codex
 |   |   |   `-- managed_config.toml -> Managed (immutable) Codex configuration.
 |   |   |-- opencode

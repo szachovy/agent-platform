@@ -8,6 +8,10 @@
     "context7": {
       "type": "local",
       "command": ["context7-mcp"]
+    },
+    "backlog-md": {
+      "type": "local",
+      "command": ["backlog-mcp", "start"]
     }
   },
   "permission": {

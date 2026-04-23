@@ -31,6 +31,8 @@ Configuration is managed through environment variables.
 | `AGENT_PLATFORM_CODEX_VERSION` | `latest` | Devcontainer build arg that selects the Codex version. | No | String (version tag, e.g. `latest` or `1.2.3`) |
 | `AGENT_PLATFORM_OPENCODE_VERSION` | `latest` | Devcontainer build arg that selects the Opencode version. | No | String (version tag, e.g. `latest` or `1.3.0`) |
 | `AGENT_PLATFORM_BACKLOG_MD_VERSION` | `latest` | Devcontainer build arg that selects the Backlog.md CLI version. | No | String (version tag, e.g. `latest` or `1.40.0`) |
+| `AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION` | `latest` | Devcontainer build arg that selects the `@radleta/backlog-md-mcp` MCP server version. | No | String (version tag, e.g. `latest` or `0.1.10`) |
+| `AGENT_PLATFORM_BEADS_VERSION` | `latest` | Devcontainer build arg that selects the `@beads/bd` CLI version. | No | String (version tag, e.g. `latest` or `1.0.2`) |
 | `AGENT_PLATFORM_CONTEXT7_VERSION` | `latest` | Devcontainer build arg that selects the Context7 MCP server version (used by Codex and Opencode; Claude now gets Context7 via the `context7` plugin). | No | String (version tag, e.g. `latest` or `1.0.0`) |
 | `AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION` | `latest` | Devcontainer build arg that selects the `@playwright/mcp` server version backing the `playwright` Claude plugin. | No | String (version tag, e.g. `latest` or `0.0.43`) |
 | `AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION` | `1.2.0` | Devcontainer build arg that selects the zsh-in-docker version. | No | String (version tag, e.g. `1.2.0`) |
