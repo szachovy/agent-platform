@@ -9,14 +9,6 @@ expected_mcp_opencode="$(jq -r '.mcp // {} | keys | join(" ")' /etc/opencode/man
 
 rc=0
 
-skill_dir_for() {
-    case "$1" in
-        claude)   echo "${HOME}/.claude/skills" ;;
-        codex)    echo "${HOME}/.codex/skills" ;;
-        opencode) echo "${HOME}/.config/opencode/skills" ;;
-    esac
-}
-
 check() {
     agent=$1 kind=$2
     shift 2
@@ -24,7 +16,7 @@ check() {
         case "$kind" in
             mcp)    "$agent" mcp list 2>&1 | grep -qi "$name" ;;
             plugin) "$agent" plugin list 2>&1 | grep -qi "$name" ;;
-            skill)  [[ -f "$(skill_dir_for "$agent")/${name}/SKILL.md" ]] ;;
+            skill)  [[ -f "${HOME}/.${agent}/skills/${name}/SKILL.md" ]] ;;
         esac && echo "PASS: ${agent} ${kind} ${name} available" || { echo "FAIL: ${agent} ${kind} ${name} not available"; rc=1; }
     done
 }

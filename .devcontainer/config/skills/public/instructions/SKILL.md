@@ -49,20 +49,17 @@ Skills are focused workflows distributed to each agent from the canonical catalo
 ### Public skills
 
 - **skills-overview** — Overview of the canonical skills catalog.
-- **build-context** — Gather comprehensive context about a codebase area before feature work or refactoring.
-- **explaining-code** — Explain code with diagrams and analogies.
-- **token-usage** — Report API token usage, remaining quota, and per-model breakdown.
 - **instructions** — This skill.
 
 ### Private skills
 
-Listed only in your local `skills/private/` directory (gitignored). Typical examples: `briefing`, `login-to-remote-do-ops`, `update-ruby-gems`.
+Listed only in your local `skills/private/` directory (gitignored).
 
 ### How to invoke a skill
 
 - **Claude Code**: Use the `Skill` tool or type `/<skill-name>` as a slash command when the skill is surfaced.
 - **Codex**: Reference the skill by name; Codex reads `SKILL.md` files from `~/.codex/skills/`.
-- **Opencode**: Skills live under `~/.config/opencode/skills/`; invoke via slash command `/<skill-name>` in the TUI.
+- **Opencode**: Reference the skill by name; Opencode reads `SKILL.md` files from `~/.opencode/skills/`.
 
 ## Slash Commands
 
@@ -72,9 +69,6 @@ Common slash commands exposed by the installed skills/plugins:
 |---------|----------------|---------|
 | `/instructions` | instructions | Show this capability index. |
 | `/skills-overview` | skills-overview | Show the skills catalog overview. |
-| `/build-context` | build-context | Start a structured codebase exploration. |
-| `/explaining-code` | explaining-code | Explain code with diagrams. |
-| `/token-usage` | token-usage | Show API token usage. |
 
 Availability of slash commands depends on the agent CLI. Use `/help` in-session to see the effective list.
 
