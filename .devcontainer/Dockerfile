@@ -89,10 +89,10 @@ RUN \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
-  for agent_skills in /home/node/.claude/skills /home/node/.codex/skills /home/node/.opencode/skills; do \
+  for agent_skills in "/home/node/.claude/skills" "/home/node/.codex/skills" "/home/node/.opencode/skills"; do \
+    rm --recursive --force "$agent_skills" && \
     mkdir --parents "$agent_skills" && \
-    ln --symbolic --force /usr/local/share/agent-platform/skills/SKILL.md "$agent_skills/SKILL.md" && \
-    find /usr/local/share/agent-platform/skills/public /usr/local/share/agent-platform/skills/private -mindepth 1 -maxdepth 1 -type d -exec ln --symbolic --force --target-directory="$agent_skills" {} +; \
+    find "/usr/local/share/agent-platform/skills/public" "/usr/local/share/agent-platform/skills/private" -mindepth 1 -maxdepth 1 -type d -exec ln --symbolic --force --target-directory="$agent_skills" {} +; \
   done && \
   mkdir --parents "/home/node/.local/bin" && \
   TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \

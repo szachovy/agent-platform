@@ -42,6 +42,10 @@ Options can be reapplied after the container is built by changing the options an
 
 Currently, extension versions can’t be specified via environment variables in a devcontainer. Use the Extensions Manager to change them if necessary.
 
+## Plugins & MCP & Skills installed
+
+From any agent invoke `/instructions` to get the informations on what and how to use installed extensions. For manual lookup see [SKILL.md](.devcontainer/skills/public/instructions/SKILL.md).
+
 ## References & Documentation
 
 - [Architecture Overview](docs/architecture.md)
