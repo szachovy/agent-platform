@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
-- Canonical skills catalog at `.devcontainer/config/skills/` distributed to all three agents (Claude, Codex, Opencode) by the Dockerfile build via per-agent symlinks.
+- Canonical skills catalog at `.devcontainer/skills/` distributed to all three agents (Claude, Codex, Opencode) by the Dockerfile build via per-agent symlinks.
 - `instructions` public skill documenting installed plugins, MCP servers, and skills with invocation guidance.
 
 ### Changed

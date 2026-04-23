@@ -22,7 +22,3 @@ skills/
 ### Public Skills (`skills/public/`)
 
 - **instructions**: Documents installed plugins, MCP servers, and skills and how to use them.
-
-### Private Skills (`skills/private/`)
-
-Private skills are not listed here - check your local `skills/private/` directory.

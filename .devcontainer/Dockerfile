@@ -28,7 +28,7 @@ COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"
 COPY --chown=node:node --chmod=0774 "config/claude" "/home/node/.claude"
 COPY --chown=node:node --chmod=0774 "config/codex" "/home/node/.codex"
 COPY --chown=node:node --chmod=0774 "config/opencode" "/home/node/.opencode"
-COPY --chown=node:node --chmod=0774 "config/skills" "/usr/local/share/agent-platform/skills"
+COPY --chown=node:node --chmod=0774 "skills" "/usr/local/share/agent-platform/skills"
 
 RUN \
   apt-get update && \

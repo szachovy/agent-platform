@@ -28,14 +28,14 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |   |   |-- AGENTS.md -> Codex agent behavior and policies.
 |   |   |   |-- TOOLS.md -> Tool usage guidance for Codex.
 |   |   |   `-- managed_config.toml -> Managed (immutable) Codex configuration.
-|   |   |-- opencode
-|   |   |   |-- AGENTS.md -> Opencode agent behavior and policies.
-|   |   |   |-- TOOLS.md -> Tool usage guidance for Opencode.
-|   |   |   `-- managed_config.json -> Managed (immutable) Opencode configuration.
-|   |   `-- skills -> Canonical skills catalog distributed to all agents at build time.
-|   |       |-- SKILL.md -> Catalog overview.
-|   |       |-- private -> Private skills (not visible in git).
-|   |       `-- public -> Public skills (visible in git), including the `instructions` skill.
+|   |   `-- opencode
+|   |       |-- AGENTS.md -> Opencode agent behavior and policies.
+|   |       |-- TOOLS.md -> Tool usage guidance for Opencode.
+|   |       `-- managed_config.json -> Managed (immutable) Opencode configuration.
+|   |-- skills -> Canonical skills catalog distributed to all agents at build time.
+|   |   |-- SKILL.md -> Catalog overview.
+|   |   |-- private -> Private skills (not visible in git).
+|   |   `-- public -> Public skills (visible in git), including the `instructions` skill.
 |   |-- devcontainer.json -> Main devcontainer definition file.
 |   |-- init-firewall.sh -> Initializes container ingress/egress rules.
 |   |-- sudoers -> Sudo policy overrides for the container.

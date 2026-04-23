@@ -1,5 +1,5 @@
 # Ignore all files inside private skill directories
-.devcontainer/config/skills/private/**/*
+.devcontainer/skills/private/**/*
 
 # Do not ignore directory structures to be kept
 !.gitkeep
