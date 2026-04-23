@@ -28,6 +28,7 @@ COPY --chmod=0664 ".trufflehog-exclude" "/home/node/.trufflehog-exclude"
 COPY --chown=node:node --chmod=0774 "config/claude" "/home/node/.claude"
 COPY --chown=node:node --chmod=0774 "config/codex" "/home/node/.codex"
 COPY --chown=node:node --chmod=0774 "config/opencode" "/home/node/.opencode"
+COPY --chown=node:node --chmod=0774 "skills" "/usr/local/share/agent-platform/skills"
 
 RUN \
   apt-get update && \
@@ -88,7 +89,11 @@ RUN \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
-  ln --symbolic /home/node/.claude/skills/public/*/ /home/node/.claude/skills/private/*/ /home/node/.claude/skills/ && \
+  for agent_skills in "/home/node/.claude/skills" "/home/node/.codex/skills" "/home/node/.opencode/skills"; do \
+    rm --recursive --force "$agent_skills" && \
+    mkdir --parents "$agent_skills" && \
+    find "/usr/local/share/agent-platform/skills/public" "/usr/local/share/agent-platform/skills/private" -mindepth 1 -maxdepth 1 -type d -exec ln --symbolic --force --target-directory="$agent_skills" {} +; \
+  done && \
   mkdir --parents "/home/node/.local/bin" && \
   TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
   curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \

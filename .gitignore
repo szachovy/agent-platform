@@ -1,6 +1,5 @@
 # Ignore all files inside private skill directories
-.devcontainer/config/claude/skills/private/**/*
-.devcontainer/config/codex/skills/private/**/*
+.devcontainer/skills/private/**/*
 
 # Do not ignore directory structures to be kept
 !.gitkeep
