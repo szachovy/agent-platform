@@ -44,7 +44,7 @@ Currently, extension versions can’t be specified via environment variables in 
 
 ## Plugins & MCP & Skills installed
 
-From any agent invoke `/instructions` to get the informations on what and how to use installed extensions. For manual lookup see [SKILL.md](.devcontainer/skills/public/instructions/SKILL.md).
+From any agent invoke `/instructions` to get the informations on what and how to use installed extensions. For manual lookup see [SKILL.md](.devcontainer/config/shared/skills/public/instructions/SKILL.md).
 
 ## References & Documentation
 
