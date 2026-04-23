@@ -54,11 +54,13 @@
     "defaultMode": "bypassPermissions"
   },
   "forceLoginMethod": "claudeai",
-  "mcpServers": {
-    "context7": {
-      "command": "context7-mcp",
-      "args": []
-    }
+  "mcpServers": {},
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "context7@claude-plugins-official": true
   },
   "enableAllProjectMcpServers": false,
   "allowManagedPermissionRulesOnly": true,
