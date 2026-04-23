@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
-- Canonical skills catalog at `.devcontainer/skills/` distributed to all three agents (Claude, Codex, Opencode) by the Dockerfile build via per-agent symlinks.
+- Canonical `.devcontainer/config/shared/` catalog (`AGENTS.md`, `TOOLS.md`, `SECURITY.md`, `skills/`) distributed to all three agents by the Dockerfile build via symlinks; Claude receives `AGENTS.md` as `CLAUDE.md`, and `TOOLS.md`/`SECURITY.md` land in each agent's `rules/` directory.
 - `instructions` public skill documenting installed plugins, MCP servers, and skills with invocation guidance.
 
 ### Changed
@@ -19,12 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scoped `packages: write` per job.
 - Consolidated per-agent `config/<agent>/skills/` trees into a single source of truth; each agent's `~/.<agent>/skills/` is now a set of symlinks into the canonical catalog.
 - `deployment.yml` now resolves `EXPECTED_SKILLS` from the canonical catalog.
+- Slimmed the always-loaded agent root files to a short numbered behavioral preamble modeled on [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills/blob/main/CLAUDE.md) and deduplicated them into a single canonical `AGENTS.md` (plus canonical `TOOLS.md` and `SECURITY.md`) under `.devcontainer/config/shared/`, distributed to all three agents by the Dockerfile via symlinks. Inline security sections previously embedded in Codex and Opencode `AGENTS.md` were extracted into the canonical `SECURITY.md`.
 
 ### Removed
 
 - `ci-tests.yml` (merged into `deployment.yml`).
 - Duplicated per-agent skill directories and agent-specific `SKILL.md` overview files under `config/claude/skills/` and `config/codex/skills/`.
 - `build-context`, `explaining-code`, and `token-usage` public skills (superseded by the consolidated catalog).
+- Per-agent `TOOLS.md` files at `.devcontainer/config/<agent>/TOOLS.md` and their follow-on per-agent `rules/tools.md` / `rules/security.md` copies — all replaced by the shared canonical catalog.
 
 ## [Version 0.1]
 

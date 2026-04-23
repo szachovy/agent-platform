@@ -18,23 +18,18 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |-- access.sh -> Runtime access test setup for the container.
 |   |-- config
 |   |   |-- claude
-|   |   |   |-- CLAUDE.md -> Claude agent usage and constraints.
-|   |   |   |-- TOOLS.md -> Tool usage guidance for Claude.
-|   |   |   |-- managed-settings.json -> Managed (immutable) settings applied to Claude.
-|   |   |   `-- rules
-|   |   |       `-- security.md -> Claude security rules and constraints.
+|   |   |   `-- managed-settings.json -> Managed (immutable) settings applied to Claude.
 |   |   |-- codex
-|   |   |   |-- AGENTS.md -> Codex agent behavior and policies.
-|   |   |   |-- TOOLS.md -> Tool usage guidance for Codex.
 |   |   |   `-- managed_config.toml -> Managed (immutable) Codex configuration.
-|   |   `-- opencode
-|   |       |-- AGENTS.md -> Opencode agent behavior and policies.
-|   |       |-- TOOLS.md -> Tool usage guidance for Opencode.
-|   |       `-- managed_config.json -> Managed (immutable) Opencode configuration.
-|   |-- skills -> Canonical skills catalog distributed to all agents at build time.
-|   |   |-- SKILL.md -> Catalog overview.
-|   |   |-- private -> Private skills (not visible in git).
-|   |   `-- public -> Public skills (visible in git), including the `instructions` skill.
+|   |   |-- opencode
+|   |   |   `-- managed_config.json -> Managed (immutable) Opencode configuration.
+|   |   `-- shared -> Canonical catalog distributed to all agents at build time via symlinks.
+|   |       |-- AGENTS.md -> Behavioral guidelines (symlinked into each agent's home; renamed to CLAUDE.md for Claude).
+|   |       |-- TOOLS.md -> Tool usage guidance (symlinked to `rules/tools.md` in each agent's home).
+|   |       |-- SECURITY.md -> Security rules (symlinked to `rules/security.md` in each agent's home).
+|   |       `-- skills -> Skills catalog (skill dirs symlinked into each agent's `skills/`).
+|   |           |-- private -> Private skills (not visible in git).
+|   |           `-- public -> Public skills (visible in git), including the `instructions` skill.
 |   |-- devcontainer.json -> Main devcontainer definition file.
 |   |-- init-firewall.sh -> Initializes container ingress/egress rules.
 |   |-- sudoers -> Sudo policy overrides for the container.
