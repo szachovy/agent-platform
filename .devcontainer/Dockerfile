@@ -6,6 +6,7 @@ ARG AGENT_PLATFORM_CODEX_VERSION
 ARG AGENT_PLATFORM_OPENCODE_VERSION
 ARG AGENT_PLATFORM_BACKLOG_MD_VERSION
 ARG AGENT_PLATFORM_CONTEXT7_VERSION
+ARG AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
 ARG AGENT_PLATFORM_TZ
 
@@ -19,7 +20,9 @@ ENV \
   TZ="${AGENT_PLATFORM_TZ}" \
   LANG='en_US.UTF-8' \
   LANGUAGE='en_US:en' \
-  LC_ALL='en_US.UTF-8'
+  LC_ALL='en_US.UTF-8' \
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="1" \
+  PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium"
 
 COPY --chmod=0555 "init-firewall.sh" "/usr/local/bin/init-firewall.sh"
 COPY --chmod=0555 "access.sh" "/usr/local/bin/access.sh"
@@ -52,7 +55,8 @@ RUN \
     jq \
     nano \
     vim \
-    moreutils && \
+    moreutils \
+    chromium && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
   mkdir --parents "/usr/local/share/npm-global" "/workspace" "/commandhistory" "/etc/claude-code/" "/etc/codex" "/etc/opencode" "/home/node/.claude" "/home/node/.codex" "/home/node/.opencode" && \
@@ -89,6 +93,13 @@ RUN \
   npm install --global "opencode-ai@${AGENT_PLATFORM_OPENCODE_VERSION}" && \
   npm install --global "backlog.md@${AGENT_PLATFORM_BACKLOG_MD_VERSION}" && \
   npm install --global "@upstash/context7-mcp@${AGENT_PLATFORM_CONTEXT7_VERSION}" && \
+  npm install --global "@playwright/mcp@${AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION}" && \
+  rm --recursive --force "/home/node/.claude/plugins" && \
+  mkdir --parents "/home/node/.claude/plugins" && \
+  CLAUDE_CODE_PLUGIN_CACHE_DIR="/home/node/.claude/plugins" claude plugin marketplace add anthropics/claude-plugins-official && \
+  for plugin in frontend-design playwright feature-dev ralph-loop context7; do \
+    CLAUDE_CODE_PLUGIN_CACHE_DIR="/home/node/.claude/plugins" claude plugin install "$plugin@claude-plugins-official"; \
+  done && \
   shared="/usr/local/share/agent-platform/shared" && \
   for entry in claude:CLAUDE.md codex:AGENTS.md opencode:AGENTS.md; do \
     home="/home/node/.${entry%%:*}" && \

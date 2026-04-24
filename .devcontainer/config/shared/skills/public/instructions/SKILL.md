@@ -24,10 +24,14 @@ Generate the rest of the content ensuring user get's up to date information:
 
 | MCP | Description | How to invoke |
 |-----|-------------|---------------|
-| `context7` | Read the overview from https://github.com/upstash/context7, summarize | Read how to use it from https://github.com/upstash/context7, summarize |
+| `context7` | Upstash Context7 — live, version-specific library documentation lookup (https://github.com/upstash/context7). On Claude, surfaced via the `context7` plugin (see table below). On Codex and Opencode, surfaced via the standalone `@upstash/context7-mcp` MCP server. | Read how to use it from https://github.com/upstash/context7, summarize. |
 
 ## Plugins available for Claude Code
 
 | Plugin | Description | How to invoke |
 |--------|-------------|---------------|
-| _(none enabled by default)_ | Claude plugins can be enabled via the `enabledPlugins` key in `/etc/claude-code/managed-settings.json`. See https://claude.com/plugins for the catalog. | After enabling, list with `claude plugin list`; invoke plugin slash commands as `/plugin-command` in a Claude session. |
+| `frontend-design@claude-plugins-official` | Production-grade frontend generation (Anthropic-managed). See https://claude.com/plugins/frontend-design. | Use plugin skills/agents from a Claude session; `claude plugin list` confirms installation. |
+| `playwright@claude-plugins-official` | Browser automation and end-to-end testing MCP server by Microsoft. Uses the system `chromium` binary at `/usr/bin/chromium` via `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. | Use plugin tools for browser automation. See https://claude.com/plugins/playwright. |
+| `feature-dev@claude-plugins-official` | Feature development workflow with explore / design / review agents (Anthropic-managed). | Invoke the bundled agents or skills from a Claude session. See https://claude.com/plugins/feature-dev. |
+| `ralph-loop@claude-plugins-official` | Iterative "Ralph Wiggum" loop for long-running tasks (Anthropic-managed). | Invoke the loop skill from a Claude session. See https://claude.com/plugins/ralph-loop. |
+| `context7@claude-plugins-official` | Upstash Context7 plugin for live, version-specific library documentation lookup. Replaces the standalone Context7 MCP on Claude. | Invoke the plugin's skill / MCP tools from a Claude session. See https://claude.com/plugins/context7. |
