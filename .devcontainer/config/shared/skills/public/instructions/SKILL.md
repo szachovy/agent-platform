@@ -25,6 +25,13 @@ Generate the rest of the content ensuring user get's up to date information:
 | MCP | Description | How to invoke |
 |-----|-------------|---------------|
 | `context7` | Upstash Context7 — live, version-specific library documentation lookup (https://github.com/upstash/context7). On Claude, surfaced via the `context7` plugin (see table below). On Codex and Opencode, surfaced via the standalone `@upstash/context7-mcp` MCP server. | Read how to use it from https://github.com/upstash/context7, summarize. |
+| `backlog-md` | Backlog.md task management via MCP (https://github.com/radleta/Backlog.md-mcp). Replaces the prior CLI + embedded-docs approach; exposes `task_create`, `task_list`, `task_edit`, `board_show`, `overview`, etc. as typed tools. | Call the MCP tools directly from any agent (e.g., `task_create`, `task_list`); no need for embedded instructions. |
+
+## CLIs available for each agent
+
+| CLI | Description | How to invoke |
+|-----|-------------|---------------|
+| `bd` | Beads graph issue tracker / agentic memory system (https://github.com/gastownhall/beads). Per upstream guidance, shell-capable agents (Claude Code, Codex, Opencode) use the CLI directly rather than an MCP wrapper — lower token cost and latency. | From a shell in the devcontainer: `bd init`, `bd create "Title"`, `bd ready`, `bd update <id> --claim`, `bd show <id>`. |
 
 ## Plugins available for Claude Code
 
