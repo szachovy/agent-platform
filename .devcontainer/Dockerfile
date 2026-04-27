@@ -71,8 +71,7 @@ RUN \
   mv "/home/node/.codex/managed_config.toml" "/etc/codex/" && \
   mv "/home/node/.opencode/managed_config.json" "/etc/opencode/" && \
   chmod 0664 "/etc/claude-code/managed-settings.json" "/etc/claude-code/managed-mcp.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
-  chown root:root "/etc/claude-code/managed-settings.json" "/etc/claude-code/managed-mcp.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json" && \
-  ln --symbolic "/etc/opencode/managed_config.json" "/home/node/.opencode/managed_config.json"
+  chown root:root "/etc/claude-code/managed-settings.json" "/etc/claude-code/managed-mcp.json" "/etc/codex/managed_config.toml" "/etc/opencode/managed_config.json"
 
 USER node
 
@@ -109,7 +108,7 @@ RUN \
   shared="/usr/local/share/agent-platform/shared" && \
   for entry in claude:CLAUDE.md codex:AGENTS.md opencode:AGENTS.md; do \
     home="/home/node/.${entry%%:*}" && \
-    rm --recursive --force "$home/skills" "$home/rules" && \
+    rm --recursive --force "$home/skills" "$home/rules" "$home/${entry##*:}" && \
     mkdir --parents "$home/skills" "$home/rules" && \
     find "$shared/skills/public" "$shared/skills/private" -mindepth 1 -maxdepth 1 -type d -exec ln --symbolic --target-directory="$home/skills" {} + && \
     ln --symbolic "$shared/AGENTS.md"   "$home/${entry##*:}" && \
