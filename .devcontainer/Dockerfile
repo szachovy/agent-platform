@@ -10,6 +10,7 @@ ARG AGENT_PLATFORM_BEADS_VERSION
 ARG AGENT_PLATFORM_CONTEXT7_VERSION
 ARG AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION
 ARG AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION
+ARG AGENT_PLATFORM_TRUFFLEHOG_VERSION
 ARG AGENT_PLATFORM_TZ
 
 ENV \
@@ -23,8 +24,6 @@ ENV \
   LANG='en_US.UTF-8' \
   LANGUAGE='en_US:en' \
   LC_ALL='en_US.UTF-8' \
-  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="1" \
-  PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium" \
   OPENCODE_CONFIG="/etc/opencode/managed_config.json"
 
 COPY --chmod=0555 "init-firewall.sh" "/usr/local/bin/init-firewall.sh"
@@ -59,6 +58,7 @@ RUN \
     nano \
     vim \
     moreutils \
+    xvfb \
     chromium && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \
@@ -116,8 +116,10 @@ RUN \
     ln --symbolic "$shared/SECURITY.md" "$home/rules/security.md"; \
   done && \
   mkdir --parents "/home/node/.local/bin" && \
-  TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//') && \
-  curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \
+  if [ -z "${AGENT_PLATFORM_TRUFFLEHOG_VERSION}" ] || [ "${AGENT_PLATFORM_TRUFFLEHOG_VERSION}" = "latest" ]; then \
+    AGENT_PLATFORM_TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
+  fi && \
+  curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${AGENT_PLATFORM_TRUFFLEHOG_VERSION}/trufflehog_${AGENT_PLATFORM_TRUFFLEHOG_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /tmp && \
   mv /tmp/trufflehog /home/node/.local/bin/trufflehog
 
 USER root

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# This check should be performed outside container in this way:
+#   EXPECTED_SKILLS="$(find .devcontainer/config/shared/skills/public -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' | xargs -n1 basename | sort | paste -sd' ')"
+#   docker run \
+#     --rm \
+#     -e EXPECTED_SKILLS="$EXPECTED_SKILLS" \
+#     -v "${{ github.workspace }}/.devcontainer/capability-check.sh:/usr/local/bin/capability-check.sh:ro" \
+#     "<devcontainer image>" \
+#     bash /usr/local/bin/capability-check.sh
+
 set -o pipefail
 
 expected_mcp_claude="$(jq -r '.mcpServers // {} | keys | join(" ")' /etc/claude-code/managed-mcp.json 2>/dev/null)"

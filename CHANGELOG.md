@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@beads/bd` CLI installed globally for all three agents (graph issue tracker / agentic memory system from https://github.com/gastownhall/beads); shell-capable agents use it directly per upstream guidance. New build args `AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION` and `AGENT_PLATFORM_BEADS_VERSION`.
 - `/etc/claude-code/managed-mcp.json` managed MCP config for Claude (the documented location for enterprise-deployed MCP servers). `claude mcp list` reads from this file, not from `mcpServers` in `managed-settings.json`.
 - `OPENCODE_CONFIG=/etc/opencode/managed_config.json` exported as a container-wide environment variable so the managed Opencode config is picked up under bash (capability-check) as well as zsh (interactive sessions).
+- `AGENT_PLATFORM_TRUFFLEHOG_VERSION` build arg to pin a specific TruffleHog release. Defaults to `latest` (existing API-driven behavior); when set to a tag (e.g. `3.95.2`), the build skips the GitHub API call and pulls the pinned release directly.
 
 ### Changed
 
@@ -36,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `build-context`, `explaining-code`, and `token-usage` public skills (superseded by the consolidated catalog).
 - Per-agent `TOOLS.md` files at `.devcontainer/config/<agent>/TOOLS.md` and their follow-on per-agent `rules/tools.md` / `rules/security.md` copies — all replaced by the shared canonical catalog.
 - `context7` entry from Claude's `managed-settings.json` `mcpServers` (the plugin now provides it). The entry remains for Codex and Opencode.
+- `statsig.anthropic.com` from the firewall allowlist — the domain no longer resolves; `statsig.com` covers Statsig traffic.
+- `instructions` public skill — replaced by the [How to use it wiki](https://github.com/szachovy/agent-platform/wiki/How-to-use-agent%E2%80%90platform).
 
 ## [Version 0.1]
 

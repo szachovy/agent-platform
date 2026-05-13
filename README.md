@@ -9,7 +9,7 @@ Agent Platform is a devcontainer-based runtime for safely configuring and runnin
 
 ## Deploying
 
-Export configuration options _(optionally)_, then create and start the devcontainer environment.
+[Export configuration options _(optionally)_](#configuration), then create and start the devcontainer environment.
 
 ```bash
 export <configuration_option>=<value>
@@ -20,6 +20,10 @@ devcontainer up \
 ```
 
 Sanity checks fails in case of security violations, but you can still use container by reloading the window.
+
+## How to use it
+
+Please refer to [How to use it wiki](https://github.com/szachovy/agent-platform/wiki/How-to-use-agent%E2%80%90platform).
 
 ## Configuration
 
@@ -36,6 +40,7 @@ Configuration is managed through environment variables.
 | `AGENT_PLATFORM_CONTEXT7_VERSION` | `latest` | Devcontainer build arg that selects the Context7 MCP server version (used by Codex and Opencode; Claude now gets Context7 via the `context7` plugin). | No | String (version tag, e.g. `latest` or `1.0.0`) |
 | `AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION` | `latest` | Devcontainer build arg that selects the `@playwright/mcp` server version backing the `playwright` Claude plugin. | No | String (version tag, e.g. `latest` or `0.0.43`) |
 | `AGENT_PLATFORM_ZSH_IN_DOCKER_VERSION` | `1.2.0` | Devcontainer build arg that selects the zsh-in-docker version. | No | String (version tag, e.g. `1.2.0`) |
+| `AGENT_PLATFORM_TRUFFLEHOG_VERSION` | `latest` | Devcontainer build arg that selects the TruffleHog release pinned during image build. With `latest`, the version is resolved from the GitHub releases API at build time. | No | String (version tag, e.g. `latest` or `3.95.2`) |
 | `AGENT_PLATFORM_ALLOW_INTERNET` | `true` | Allow internet access inside the devcontainer. | No | Boolean (`true`/`false`) |
 | `AGENT_PLATFORM_ALLOW_SSH_AGENT` | `true` | Allow SSH agent forwarding into the devcontainer. | No | Boolean (`true`/`false`) |
 | `AGENT_PLATFORM_ALLOW_HOST_NETWORK` | `true` | Allow host network access from the devcontainer. | No | Boolean (`true`/`false`) |
@@ -44,10 +49,6 @@ Configuration is managed through environment variables.
 Options can be reapplied after the container is built by changing the options and restarting.
 
 Currently, extension versions can’t be specified via environment variables in a devcontainer. Use the Extensions Manager to change them if necessary.
-
-## Plugins & MCP & Skills installed
-
-From any agent invoke `/instructions` to get the informations on what and how to use installed extensions. For manual lookup see [SKILL.md](.devcontainer/config/shared/skills/public/instructions/SKILL.md).
 
 ## References & Documentation
 
