@@ -30,7 +30,7 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |       |-- SECURITY.md -> Security rules (symlinked to `rules/security.md` in each agent's home).
 |   |       `-- skills -> Skills catalog (skill dirs symlinked into each agent's `skills/`).
 |   |           |-- private -> Private skills (not visible in git).
-|   |           `-- public -> Public skills (visible in git), including the `instructions` skill.
+|   |           `-- public -> Public skills (visible in git).
 |   |-- devcontainer.json -> Main devcontainer definition file.
 |   |-- init-firewall.sh -> Initializes container ingress/egress rules.
 |   |-- sudoers -> Sudo policy overrides for the container.
