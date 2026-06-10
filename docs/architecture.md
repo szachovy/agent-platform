@@ -16,6 +16,7 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |-- .devcontainer
 |   |-- Dockerfile -> Base image and build steps for the devcontainer.
 |   |-- access.sh -> Runtime access test setup for the container.
+|   |-- capability-check.sh -> Per-agent capability probe verifying MCPs, plugins, and skills.
 |   |-- config
 |   |   |-- claude
 |   |   |   |-- managed-settings.json -> Managed (immutable) settings applied to Claude.
@@ -34,7 +35,7 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |   |-- devcontainer.json -> Main devcontainer definition file.
 |   |-- init-firewall.sh -> Initializes container ingress/egress rules.
 |   |-- sudoers -> Sudo policy overrides for the container.
-|   `-- trufflehog-exclude -> Patterns excluded from secret filesystem and env scanning.
+|   `-- .trufflehog-exclude -> Patterns excluded from secret filesystem and env scanning.
 |-- .github
 |   `-- workflows
 |       `-- deployment.yml -> Builds, scans, smoke-tests, and publishes the devcontainer image via GitHub Actions.
@@ -43,5 +44,8 @@ Agent Platform is a devcontainer-first runtime for configuring and running AI ag
 |-- CHANGELOG.md -> Notable changes by release.
 |-- CONTRIBUTING.md -> Contribution workflow and guidelines.
 |-- LICENSE -> Project license.
-`-- README.md -> Project overview and usage instructions.
+|-- README.md -> Project overview and usage instructions.
+`-- docs
+    |-- architecture.md -> This file; project structure and design overview.
+    `-- Wiktor Maj - Secure AI Deployments.pdf -> Reference material on secure AI deployment practices.
 ```
