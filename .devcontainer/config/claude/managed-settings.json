@@ -1,16 +1,4 @@
 {
-  "hooks": {
-    "SessionStart": [],
-    "PreToolUse": [],
-    "PermissionRequest": [],
-    "PostToolUse": [],
-    "Notification": [],
-    "UserPromptSubmit": [],
-    "Stop": [],
-    "SubagentStop": [],
-    "PreCompact": [],
-    "SessionEnd": []
-  },
   "permissions": {
     "deny": [
       "Read(**/.env*)",
@@ -63,7 +51,6 @@
   },
   "enableAllProjectMcpServers": false,
   "allowManagedPermissionRulesOnly": true,
-  "allowManagedHooksOnly": true,
   "attribution": {
     "commit": "",
     "pr": ""
