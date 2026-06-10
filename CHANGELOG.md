@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [Version 0.2]
+
 ### Added
 
 - Per-agent capability probe (`capability-check.sh`) verifying configured MCPs, plugins, and skills are visible to Claude, Codex, and opencode.
@@ -89,5 +91,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation (LICENSE, CONTRIBUTING, README, CHANGELOG, and architecture docs).
 - Build scripts and GitHub workflows integration.
 
-[Unreleased]: https://github.com/szachovy/agent-platform/compare/0.1...HEAD
+[Unreleased]: https://github.com/szachovy/agent-platform/compare/0.2...HEAD
+[Version 0.2]: https://github.com/szachovy/agent-platform/releases/tag/0.2
 [Version 0.1]: https://github.com/szachovy/agent-platform/releases/tag/0.1
