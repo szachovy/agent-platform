@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/etc/claude-code/managed-mcp.json` managed MCP config for Claude (the documented location for enterprise-deployed MCP servers). `claude mcp list` reads from this file, not from `mcpServers` in `managed-settings.json`.
 - `OPENCODE_CONFIG=/etc/opencode/managed_config.json` exported as a container-wide environment variable so the managed Opencode config is picked up under bash (capability-check) as well as zsh (interactive sessions).
 - `AGENT_PLATFORM_TRUFFLEHOG_VERSION` build arg to pin a specific TruffleHog release. Defaults to `latest` (existing API-driven behavior); when set to a tag (e.g. `3.95.2`), the build skips the GitHub API call and pulls the pinned release directly.
+- `@playwright/mcp` MCP server registered for Codex and Opencode managed configs (Claude gets it via the `playwright` plugin).
+- "How to use it" section in README linking to the [wiki](https://github.com/szachovy/agent-platform/wiki/How-to-use-agent%E2%80%90platform).
 - VS Code `1.121.0` devcontainer workspace-folder bug warning and symlink workaround documented in README.
 
 ### Changed
@@ -29,7 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Slimmed the always-loaded agent root files to a short numbered behavioral preamble modeled on [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills/blob/main/CLAUDE.md) and deduplicated them into a single canonical `AGENTS.md` (plus canonical `TOOLS.md` and `SECURITY.md`) under `.devcontainer/config/shared/`, distributed to all three agents by the Dockerfile via symlinks. Inline security sections previously embedded in Codex and Opencode `AGENTS.md` were extracted into the canonical `SECURITY.md`.
 - Claude receives Context7 via the `context7` plugin instead of the standalone `@upstash/context7-mcp` MCP server. Codex and Opencode continue to use the standalone MCP.
 - Backlog.md integration moved from per-agent CLI + embedded markdown instructions to a dedicated `backlog-md` MCP server.
+- Credential path deny lists added to Codex `managed_config.toml` filesystem permissions (`.env*`, `.pem`, `.key`, `.crt`, `.ssh/`, `.aws/`, `.azure/`, `.config/gcloud/`, `.gnupg/`, `.kube/`, `.docker/`).
 - Re-enabled plugin hooks in Claude Code managed settings by removing empty hook arrays and the `allowManagedHooksOnly` restriction.
+- `docs/architecture.md` updated to reflect the shared catalog structure, consolidated per-agent config directories, and merged CI workflow.
+- README configuration table expanded with new build args (`AGENT_PLATFORM_BACKLOG_MD_MCP_VERSION`, `AGENT_PLATFORM_BEADS_VERSION`, `AGENT_PLATFORM_PLAYWRIGHT_MCP_VERSION`, `AGENT_PLATFORM_TRUFFLEHOG_VERSION`).
+- `.gitignore` updated to reference the shared skills directory (`config/shared/skills/private/`) instead of per-agent paths.
 
 ### Fixed
 
@@ -40,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ci-tests.yml` (merged into `deployment.yml`).
 - Duplicated per-agent skill directories and agent-specific `SKILL.md` overview files under `config/claude/skills/` and `config/codex/skills/`.
 - `build-context`, `explaining-code`, and `token-usage` public skills (superseded by the consolidated catalog).
-- Per-agent `TOOLS.md` files at `.devcontainer/config/<agent>/TOOLS.md` and their follow-on per-agent `rules/tools.md` / `rules/security.md` copies — all replaced by the shared canonical catalog.
+- Per-agent `CLAUDE.md`, `AGENTS.md`, and `TOOLS.md` root files and their follow-on per-agent `rules/tools.md` / `rules/security.md` copies — all replaced by the shared canonical catalog.
 - `context7` entry from Claude's `managed-settings.json` `mcpServers` (the plugin now provides it). The entry remains for Codex and Opencode.
 - `statsig.anthropic.com` from the firewall allowlist — the domain no longer resolves; `statsig.com` covers Statsig traffic.
 - `instructions` public skill — replaced by the [How to use it wiki](https://github.com/szachovy/agent-platform/wiki/How-to-use-agent%E2%80%90platform).
