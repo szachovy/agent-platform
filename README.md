@@ -19,6 +19,14 @@ devcontainer up \
   --build-no-cache
 ```
 
+> **Warning:** In VS Code `1.121.0` (`f6cfa2ea2403534de03f069bdf160d06451ed282`, x64) there is a bug where `devcontainer up` ignores the provided `--workspace-folder` and still searches for the `.devcontainer` directory in the default location. As a workaround, create a symlink at container start:
+>
+> ```bash
+> ln -s <path-to-.devcontainer-directory> <workspace-path>
+> ```
+>
+> Without this you will see: `Error: Dev container config (<path>) not found.`
+
 Sanity checks fails in case of security violations, but you can still use container by reloading the window.
 
 ## How to use it
