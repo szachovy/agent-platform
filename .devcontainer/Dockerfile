@@ -58,7 +58,6 @@ RUN \
     nano \
     vim \
     moreutils \
-    xvfb \
     chromium && \
   apt-get clean && \
   rm --recursive --force "/var/lib/apt/lists/*" && \

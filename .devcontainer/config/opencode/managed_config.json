@@ -11,14 +11,16 @@
     },
     "backlog-md": {
       "type": "local",
-      "command": ["backlog-mcp", "start"]
+      "command": ["backlog-mcp", "start"],
+      "env": {
+        "PWD": "/workspace"
+      }
     },
     "playwright": {
       "type": "local",
-      "command": ["npx", "@playwright/mcp@latest", "--browser", "chromium"],
+      "command": ["npx", "@playwright/mcp@latest", "--browser", "chromium", "--executable-path", "/usr/bin/chromium", "--headless"],
       "env": {
-        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
-        "DISPLAY": ":99"
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
       }
     }
   },

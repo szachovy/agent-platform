@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Playwright MCP (`claude`, `codex`, `opencode`) now launches the apt-installed `/usr/bin/chromium` headlessly via `--executable-path`/`--headless`, instead of falling back to its own separately-downloaded `chrome-for-testing` build (`--browser chromium` alone resolves to that channel internally). Removed the `xvfb` apt package and the unused `DISPLAY` env var, both dead weight since no Xvfb server was ever started.
+- Backlog MCP (`backlog-md`) now gets an explicit `PWD=/workspace` env var so it correctly detects an already-initialized Backlog.md project instead of inheriting a stale `PWD` from the VS Code server process chain and reporting "not initialized".
+
 ## [Version 0.2]
 
 ### Added
