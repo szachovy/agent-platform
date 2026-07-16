@@ -2,14 +2,16 @@
   "mcpServers": {
     "backlog-md": {
       "command": "backlog-mcp",
-      "args": ["start"]
+      "args": ["start"],
+      "env": {
+        "PWD": "/workspace"
+      }
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest", "--browser", "chromium"],
+      "args": ["@playwright/mcp@latest", "--browser", "chromium", "--executable-path", "/usr/bin/chromium", "--headless"],
       "env": {
-        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
-        "DISPLAY": ":99"
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
       }
     },
     "context7": {
